@@ -2,7 +2,7 @@ export const properties: IProperties[] = [{
   propertyName: 'logo',
   URL: '',
   Height: 'unset',
-  Width: 'unset'
+  Width: '200'
 }]
 
 

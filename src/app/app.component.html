@@ -1,45 +1,62 @@
 <div class="h-screen w-screen overflow-hidden relative flex justify-center items-center">
+
   <div class="w-10/12 lg:w-6/12 min-h-[4em] p-8 rounded shadow ring-1 ring-gray-200 hover:shadow-lg transition-all">
     <ng-container *ngFor="let property of properties">
-      <h3 class="font-bold mb-2 capitalize">{{property.propertyName}}</h3>
+      <h3 class="font-bold mb-2 capitalize">{{ property.propertyName }}</h3>
       <div class="flex justify-around gap-2">
+        <div
+          class="absolute w-2/5 overflow-hidden mx-auto flex justify-center h-12 hover:scale-150 z-50 translate-y-full transition-all top-0">
+          <img [src]="sanitize(property.URL)" [height]="property.Height" [width]="property.Width" />
+        </div>
         <div class="relative flex-1">
-          <input type="text" id="{{property.propertyName}}_URL"
+          <input type="text" id="{{ property.propertyName }}_URL"
             class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             placeholder=" " [value]="property.URL" (change)="onInputChange($event, property, 'URL')" />
-          <label for="{{property.propertyName}}_URL"
-            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">{{property.propertyName}}
-            URL</label>
+          <label for="{{ property.propertyName }}_URL"
+            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">{{
+            property.propertyName }} URL</label>
+
         </div>
         <div class="relative">
-          <input type="text" id="{{property.propertyName}}_width"
+          <input type="text" id="{{ property.propertyName }}_width"
             class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             placeholder=" " [value]="property.Width" (change)="onInputChange($event, property, 'Width')" />
-          <label for="{{property.propertyName}}_width"
-            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">{{property.propertyName}}
-            width</label>
+          <label for="{{ property.propertyName }}_width"
+            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">{{
+            property.propertyName }} width</label>
         </div>
         <div class="relative">
-          <input type="text" id="{{property.propertyName}}_height"
+          <input type="text" id="{{ property.propertyName }}_height"
             class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             placeholder=" " [value]="property.Height" (change)="onInputChange($event, property, 'Height')" />
-          <label for="{{property.propertyName}}_height"
-            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">{{property.propertyName}}
-            height</label>
+          <label for="{{ property.propertyName }}_height"
+            class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">{{
+            property.propertyName }} height</label>
         </div>
       </div>
       <div class="mt-12 flex justify-center">
-        <button (click)="rePlaceKeyCode()" type="button"
-          class="text-gray-900 w-full transition-all bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
-          Processing
+        <button (click)="rePlaceKeyCode()"
+          class="relative w-full px-5 py-3 overflow-hidden font-medium text-gray-600 bg-gray-100 border border-gray-100 rounded-lg shadow-inner group">
+          <span
+            class="absolute top-0 left-0 w-0 h-0 transition-all duration-200 border-t-2 border-gray-600 group-hover:w-full ease"></span>
+          <span
+            class="absolute bottom-0 right-0 w-0 h-0 transition-all duration-200 border-b-2 border-gray-600 group-hover:w-full ease"></span>
+          <span
+            class="absolute top-0 left-0 w-full h-0 transition-all duration-300 delay-200 bg-gray-600 group-hover:h-full ease"></span>
+          <span
+            class="absolute bottom-0 left-0 w-full h-0 transition-all duration-300 delay-200 bg-gray-600 group-hover:h-full ease"></span>
+          <span
+            class="absolute inset-0 w-full h-full duration-300 delay-300 bg-gray-900 opacity-0 group-hover:opacity-100"></span>
+          <span class="relative transition-colors duration-300 delay-200 group-hover:text-white ease">Processing
+            !</span>
         </button>
       </div>
     </ng-container>
   </div>
   <div
     class="absolute flex justify-center items-center transition-all duration-500 z-50 shadow-md bg-slate-200 h-full w-full top-0 translate-y-full transform"
-    [ngClass]="{'translate-y-0' : isProcess}">
-    <div class="h-2/3 w-5/6 lg:w-2/3 flex flex-col p-6 bg-white hover:shadow-md rounded-lg ">
+    [ngClass]="{ '!translate-y-0': isProcess }">
+    <div class="h-2/3 w-5/6 lg:w-2/3 flex flex-col p-6 bg-white hover:shadow-md rounded-lg">
       <div class="relative flex-1">
         <textarea type="" id="queryText"
           class="block px-2.5 h-full pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
@@ -49,7 +66,7 @@
           class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">Query</label>
         <div *ngIf="!editQuery"
           class="absolute top-0 h-full w-full bg-slate-600 bg-opacity-0 hover:bg-opacity-10 overflow-hidden transition-all ease-in duration-200">
-          <div class="h-full w-full transition-all flex justify-center gap-4 items-center  opacity-0 hover:opacity-100">
+          <div class="h-full w-full transition-all flex justify-center gap-4 items-center opacity-0 hover:opacity-100">
             <button class="px-4 bg-white hover:shadow-md py-1 rounded-md ring-1 ring-gray-300 hover:ring-blue-500"
               (click)="back()">
               <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
@@ -74,29 +91,27 @@
           </div>
         </div>
       </div>
-      <div class="h-0 opacity-0 transition-all overflow-hidden" [ngClass]="{'!h-16 opacity-100': editQuery}">
+      <div class="h-0 font-sans opacity-0 transition-all overflow-hidden"
+        [ngClass]="{ '!h-16 opacity-100': editQuery }">
         <div class="pt-5 pb-1 w-full text-gray-500 flex justify-center gap-4 mx-auto">
           <button
-            class="px-4 uppercase bg-white hover:shadow-md py-1 rounded-md ring-1 ring-gray-300 hover:ring-blue-500 font-semibold transform hover:rotate-6 duration-500" [ngClass]="{'bg-blue-500 text-white': isQueryInset}"
-            (click)="changeQueryShow('inset')">
-            INSET
+            class="px-4 capitalize font-bold bg-gray-50 hover:shadow-md py-1 rounded-md transform hover:rotate-6 duration-500"
+            [ngClass]="{ '!bg-[#ffb618] text-gray-900 ': isQueryInset }" (click)="changeQueryShow('inset')">
+            Inset
           </button>
           <button
-            class="px-4 uppercase bg-white hover:shadow-md py-1 rounded-md ring-1 ring-gray-300 hover:ring-blue-500 font-semibold  transform hover:-rotate-3 duration-500" [ngClass]="{'bg-blue-500 text-white': !isQueryInset}"
-            (click)="changeQueryShow('update')">
+            class="px-4 capitalize font-bold bg-gray-50 hover:shadow-md py-1 rounded-md transform hover:-rotate-3 duration-500"
+            [ngClass]="{ '!bg-[#ffb618] text-gray-900 ': !isQueryInset }" (click)="changeQueryShow('update')">
             Update
           </button>
-          <button class="px-4 bg-white hover:shadow-md py-1 rounded-md ring-1 ring-gray-300 hover:ring-blue-500 transform hover:rotate-6 duration-500"
+          <button
+            class="px-4 capitalize font-bold bg-[#ffb618] text-gray-900 hover:shadow-md hover:bg-black hover:text-white py-1 rounded-md duration-500"
             (click)="closeEditQuery()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-              <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                <path d="M17 21v-8H7v8M7 3v5h8" />
-              </g>
-            </svg> </button>
+            Save
+          </button>
+
         </div>
       </div>
-
     </div>
   </div>
 </div>
