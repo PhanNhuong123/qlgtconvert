@@ -39,7 +39,15 @@ export class AppComponent implements OnInit {
       })
     })
     this.queryShow = result;
+  }
+
+  public processing(): void {
+    this.rePlaceKeyCode();
+    if (!this.isQueryInset) {
+      this.convertAllInsertToUpdate();
+    }
     this.isProcess = true;
+
   }
 
   public onInputChange(event: Event, property: IProperties, tap: string): void {
