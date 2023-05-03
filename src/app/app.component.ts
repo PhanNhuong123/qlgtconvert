@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { IProperties, properties } from './app.constant';
+import { IProperties, ITemplate, properties } from './app.constant';
 import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
@@ -17,12 +17,15 @@ export class AppComponent implements OnInit {
   public editQuery: boolean = false;
   public isQueryInset: boolean = true;
   public isEditingRawFile: boolean = false;
-  public errorText = 'Error to convert raw file !'
+  public errorText = 'Error to convert raw file !';
+  public emailTemplates: ITemplate[] = [];
+  public isShowTemplate: boolean = false;
+  public emailTemplateIndex: number = 1;
 
   constructor(
     private httpClient: HttpClient,
     private sanitizer: DomSanitizer
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.httpClient
@@ -32,6 +35,44 @@ export class AppComponent implements OnInit {
           this.queryText = res;
         }
       });
+  }
+
+  public ChooseEmailTemplate(index: number): void {
+    this.emailTemplateIndex = index ?? 1;
+  }
+
+  public getListTemplate() {
+    const tables: string[] = this.queryShow
+      .split('INSERT INTO')
+      .map((value) => 'INSERT INTO' + value);
+    tables.shift();
+    tables.forEach((tableQuery, index) => {
+      const updateQuery = this.convertInsertToUpdate(tableQuery);
+      const htmlContent: string =
+        /(?<=htmlcontent\s*[`']\s*=\s*[`']).*(?='\s*,\s*[`']userID[`'])/gi.exec(
+          updateQuery
+        )?.[0] ?? '';
+      const email: string =
+        /(?<=title\s*[`']\s*=\s*[`']).*(?='\s*,\s*[`']subject[`'])/gi.exec(
+          updateQuery
+        )?.[0] ?? '';
+      const newTemplate: ITemplate = {
+        id: index,
+        email: email,
+        htmlContent: htmlContent.replaceAll(/\\r\\n|\\/gi, ''),
+      };
+      this.emailTemplates.push(newTemplate);
+    });
+  }
+
+  public closeEmailTemplate() {
+    this.isShowTemplate = false;
+  }
+
+  public handleShowTemplate() {
+    this.isShowTemplate = true;
+    this.getListTemplate();
+    console.log(this.emailTemplates);
   }
 
   public rePlaceKeyCode(): void {
@@ -109,7 +150,7 @@ export class AppComponent implements OnInit {
   public convertInsertToUpdate(insertQuery: string): string {
     const tableName =
       '`' +
-      insertQuery.match(/(?<=(insert\sinto\s[`'"]))\w+(?=['"`])/gi)?.[0] +
+      insertQuery.match(/(?<=(insert\s+into\s*[`'"]))\w+(?=['"`])/gi)?.[0] +
       '`';
 
     const columnsStartIndex = insertQuery.indexOf('(') + 1;

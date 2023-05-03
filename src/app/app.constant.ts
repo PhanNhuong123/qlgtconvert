@@ -13,3 +13,9 @@ export interface IProperties {
   Width: string,
   [key: string]: string
 }
+
+export interface ITemplate {
+  id: number;
+  email: string;
+  htmlContent: string
+}

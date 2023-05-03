@@ -50,6 +50,9 @@
       </div>
     </ng-container>
   </div>
+
+  <!-- show query -->
+
   <div
     class="absolute flex justify-center items-center transition-all duration-500 z-50 shadow-md bg-slate-200 h-full w-full top-0 translate-y-full transform"
     [ngClass]="{ '!translate-y-0': isProcess }">
@@ -60,7 +63,7 @@
           placeholder=" " (change)="handleQueyChange($event)" (keyup)="handleQueyChange($event)" [value]="queryShow">
         </textarea>
         <label for="queryText"
-          class="absolute text-sm text-gray-500 duration-300 transform z-10 origin-[0] bg-white px-2 peer-focus:text-blue-600  top-2 scale-75 -translate-y-4 left-1">Query</label>
+          class="absolute text-sm text-gray-500 duration-300 transform z-10 origin-[0] bg-white px-2 peer-focus:text-blue-600 top-2 scale-75 -translate-y-4 left-1">Query</label>
         <div *ngIf="!editQuery"
           class="absolute top-0 h-full w-full bg-slate-600 bg-opacity-0 hover:bg-opacity-10 overflow-hidden transition-all ease-in duration-200">
           <div class="h-full w-full transition-all flex justify-center gap-4 items-center opacity-0 hover:opacity-100">
@@ -85,6 +88,15 @@
                   d="M5 19h1.4l8.625-8.625l-1.4-1.4L5 17.6V19ZM19.3 8.925l-4.25-4.2l1.4-1.4q.575-.575 1.413-.575t1.412.575l1.4 1.4q.575.575.6 1.388t-.55 1.387L19.3 8.925ZM17.85 10.4L7.25 21H3v-4.25l10.6-10.6l4.25 4.25Zm-3.525-.725l-.7-.7l1.4 1.4l-.7-.7Z" />
               </svg>
             </button>
+            <button class="px-4 bg-white hover:shadow-md py-1 rounded-md ring-1 ring-gray-300 hover:ring-blue-500"
+              (click)="handleShowTemplate()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+                <path fill="#888888"
+                  d="M12 9a3.02 3.02 0 0 0-3 3c0 1.642 1.358 3 3 3c1.641 0 3-1.358 3-3c0-1.641-1.359-3-3-3z" />
+                <path fill="#888888"
+                  d="M12 5c-7.633 0-9.927 6.617-9.948 6.684L1.946 12l.105.316C2.073 12.383 4.367 19 12 19s9.927-6.617 9.948-6.684l.106-.316l-.105-.316C21.927 11.617 19.633 5 12 5zm0 12c-5.351 0-7.424-3.846-7.926-5C4.578 10.842 6.652 7 12 7c5.351 0 7.424 3.846 7.926 5c-.504 1.158-2.578 5-7.926 5z" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
@@ -93,14 +105,16 @@
         <div class="pt-5 pb-1 w-full text-gray-500 flex justify-center gap-4 mx-auto">
           <button
             class="px-4 capitalize font-bold bg-gray-50 hover:shadow-md py-1 rounded-md transform hover:rotate-6 duration-500"
-            [ngClass]="{'!bg-black !text-white': isQueryInset && !isEditingRawFile }"
-            (click)="changeQueryShow('inset')">
+            [ngClass]="{
+              '!bg-black !text-white': isQueryInset && !isEditingRawFile
+            }" (click)="changeQueryShow('inset')">
             Inset
           </button>
           <button
             class="px-4 capitalize font-bold bg-gray-50 hover:shadow-md py-1 rounded-md transform hover:-rotate-3 duration-500"
-            [ngClass]="{'!bg-black !text-white': !isQueryInset && !isEditingRawFile }"
-            (click)="changeQueryShow('update')">
+            [ngClass]="{
+              '!bg-black !text-white': !isQueryInset && !isEditingRawFile
+            }" (click)="changeQueryShow('update')">
             Update
           </button>
           <button
@@ -114,6 +128,33 @@
             Raw
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+  <!-- show email template  -->
+  <div
+    class="absolute flex justify-center items-center transition-all duration-500 z-50 shadow-md bg-slate-200 h-full w-full top-0 translate-y-full transform"
+    [ngClass]="{ '!translate-y-0': isShowTemplate }">
+    <div *ngIf="emailTemplates.length > 0" class="h-5/6 w-5/6 flex p-6 bg-white hover:shadow-md rounded-lg">
+      <div class="w-2/5 max-w-[400px] mr-2 pr-2 overflow-auto">
+        <div *ngFor="let emailTemplate of emailTemplates; index as i">
+          <button (click)="ChooseEmailTemplate(i)"
+            class="w-full my-0.5 px-5 py-2.5 font-medium bg-blue-50 hover:bg-blue-100 hover:text-blue-600 text-blue-500 rounded-lg text-sm">
+            {{ emailTemplate.email }}
+          </button>
+        </div>
+      </div>
+      <div class="flex-1 pl-2 border-l border-r border-gray-200">
+        <div [innerHTML]="
+            emailTemplates[emailTemplateIndex].htmlContent | safeHtml
+          "></div>
+      </div>
+      <div (click)="closeEmailTemplate();"
+        class="absolute flex w-full justify-center cursor-pointer opacity-40 top-1 left-1/2 right-1/2 transition-all -translate-x-1/2 hover:opacity-100 hover:scale-125 hover:text-blue-500">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 256 256">
+          <path fill="currentColor"
+            d="M128 26a102 102 0 1 0 102 102A102.12 102.12 0 0 0 128 26Zm0 192a90 90 0 1 1 90-90a90.1 90.1 0 0 1-90 90Zm36.24-102.24a6 6 0 1 1-8.48 8.48L134 102.49V168a6 6 0 0 1-12 0v-65.51l-21.76 21.75a6 6 0 0 1-8.48-8.48l32-32a6 6 0 0 1 8.48 0Z" />
+        </svg>
       </div>
     </div>
   </div>
