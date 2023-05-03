@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
   public errorText = 'Error to convert raw file !';
   public emailTemplates: ITemplate[] = [];
   public isShowTemplate: boolean = false;
-  public emailTemplateIndex: number = 1;
+  public emailTemplateIndex: number = 0;
 
   constructor(
     private httpClient: HttpClient,
