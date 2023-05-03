@@ -42,7 +42,8 @@ export class AppComponent implements OnInit {
   }
 
   public getListTemplate() {
-    const tables: string[] = this.queryShow
+    this.emailTemplates.length = 0;
+    const tables: string[] = this.queryText
       .split('INSERT INTO')
       .map((value) => 'INSERT INTO' + value);
     tables.shift();
@@ -72,7 +73,6 @@ export class AppComponent implements OnInit {
   public handleShowTemplate() {
     this.isShowTemplate = true;
     this.getListTemplate();
-    console.log(this.emailTemplates);
   }
 
   public rePlaceKeyCode(): void {
@@ -98,6 +98,7 @@ export class AppComponent implements OnInit {
     if (!this.isQueryInset) {
       this.convertAllInsertToUpdate();
     }
+    this.getListTemplate();
     this.isProcess = true;
   }
 
