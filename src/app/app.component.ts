@@ -25,7 +25,7 @@ export class AppComponent implements OnInit {
   constructor(
     private httpClient: HttpClient,
     private sanitizer: DomSanitizer
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.httpClient
@@ -94,12 +94,19 @@ export class AppComponent implements OnInit {
   }
 
   public processing(): void {
-    this.rePlaceKeyCode();
-    if (!this.isQueryInset) {
-      this.convertAllInsertToUpdate();
-    }
-    this.getListTemplate();
-    this.isProcess = true;
+    this.httpClient
+      .get('assets/emails_emailscontent.sql', { responseType: 'text' })
+      .subscribe((res) => {
+        if (res) {
+          this.queryText = res;
+          this.rePlaceKeyCode();
+          if (!this.isQueryInset) {
+            this.convertAllInsertToUpdate();
+          }
+          this.getListTemplate();
+          this.isProcess = true;
+        }
+      });
   }
 
   public onInputChange(event: Event, property: IProperties, tap: string): void {
