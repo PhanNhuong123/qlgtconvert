@@ -17,6 +17,7 @@ export class AppComponent implements OnInit {
   public editQuery: boolean = false;
   public isQueryInset: boolean = true;
   public isEditingRawFile: boolean = false;
+  public errorText = 'Error to convert raw file !'
 
   constructor(
     private httpClient: HttpClient,
@@ -158,6 +159,9 @@ export class AppComponent implements OnInit {
       this.isQueryInset = false;
       this.rePlaceKeyCode();
       this.convertAllInsertToUpdate();
+    }
+    if (this.queryShow.trim().length === 0) {
+      this.queryShow = this.errorText;
     }
   }
 
