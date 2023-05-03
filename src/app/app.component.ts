@@ -43,7 +43,8 @@ export class AppComponent implements OnInit {
 
   public getListTemplate() {
     this.emailTemplates.length = 0;
-    const tables: string[] = this.queryText
+    this.rePlaceKeyCode();
+    const tables: string[] = this.queryShow
       .split('INSERT INTO')
       .map((value) => 'INSERT INTO' + value);
     tables.shift();
