@@ -57,7 +57,7 @@
       <div class="relative flex-1">
         <textarea type="" id="queryText"
           class="block px-2.5 h-full pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-          placeholder=" " (change)="handleQueyChange($event)" [value]="queryShow">
+          placeholder=" " (change)="handleQueyChange($event)" (keyup)="handleQueyChange($event)" [value]="queryShow">
         </textarea>
         <label for="queryText"
           class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">Query</label>
@@ -93,18 +93,25 @@
         <div class="pt-5 pb-1 w-full text-gray-500 flex justify-center gap-4 mx-auto">
           <button
             class="px-4 capitalize font-bold bg-gray-50 hover:shadow-md py-1 rounded-md transform hover:rotate-6 duration-500"
-            [ngClass]="{ '!bg-[#ffb618] text-gray-900 ': isQueryInset }" (click)="changeQueryShow('inset')">
+            [ngClass]="{'!bg-black !text-white': isQueryInset && !isEditingRawFile }"
+            (click)="changeQueryShow('inset')">
             Inset
           </button>
           <button
             class="px-4 capitalize font-bold bg-gray-50 hover:shadow-md py-1 rounded-md transform hover:-rotate-3 duration-500"
-            [ngClass]="{ '!bg-[#ffb618] text-gray-900 ': !isQueryInset }" (click)="changeQueryShow('update')">
+            [ngClass]="{'!bg-black !text-white': !isQueryInset && !isEditingRawFile }"
+            (click)="changeQueryShow('update')">
             Update
           </button>
           <button
             class="px-4 capitalize font-bold bg-[#ffb618] text-gray-900 hover:shadow-md hover:bg-black hover:text-white py-1 rounded-md duration-500"
             (click)="closeEditQuery()">
             Save
+          </button>
+          <button
+            class="px-4 capitalize font-bold bg-gray-50 text-gray-900 hover:shadow-md hover:bg-black hover:text-white py-1 rounded-md duration-500"
+            [ngClass]="{ '!bg-black !text-white': isEditingRawFile }" (click)="editRawFile()">
+            Raw
           </button>
         </div>
       </div>
