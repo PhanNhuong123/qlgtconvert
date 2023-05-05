@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { EProperty, IProperty, ITemplate } from './app.constant';
 import { GlobalStore } from './store/global.store';
 
@@ -23,6 +23,11 @@ export class AppComponent implements OnInit {
   // public emailTemplates: ITemplate[] = [];
   // public isShowTemplate: boolean = false;
   // public emailTemplateIndex: number = 0;
+  public isSelectQuery: boolean = false;
+  public listQuerySelect = new Set<number>();
+  public listOptionQuery: ITemplate[] = [];
+  public searchResult: ITemplate[] | null = null;
+  public searchValue: string = '';
 
   constructor(
     private httpClient: HttpClient,
@@ -62,7 +67,7 @@ export class AppComponent implements OnInit {
     this.store.updateEmailTemplateIndex(index ?? 0);
   }
 
-  public getListTemplate() {
+  public getListTemplate(): void {
     this.store.emailTemplates.length = 0;
     this.rePlaceKeyCode();
     console.log(this.store.queryShow);
@@ -90,11 +95,11 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public closeEmailTemplate() {
+  public closeEmailTemplate(): void {
     this.store.updateShowTemplate(false);
   }
 
-  public handleShowTemplate() {
+  public handleShowTemplate(): void {
     this.store.updateShowTemplate(true);
     this.getListTemplate();
   }
@@ -134,6 +139,7 @@ export class AppComponent implements OnInit {
           }
           this.getListTemplate();
           this.store.updateIsProcess(true);
+          this.listQuerySelect.clear();
         }
       });
   }
@@ -187,7 +193,7 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public convertInsertToUpdate(insertQuery: string): string {
+  public convertInsertToUpdate(insertQuery: string, removeId = true): string {
     const tableName =
       '`' +
       insertQuery.match(/(?<=(insert\s+into\s*[`'"]))\w+(?=['"`])/gi)?.[0] +
@@ -198,7 +204,9 @@ export class AppComponent implements OnInit {
       .slice(columnsStartIndex, insertQuery.indexOf(')'))
       .split(',');
     const trimmedColumns = columns.map((col) => col.trim());
-    trimmedColumns.shift();
+    if (removeId) {
+      trimmedColumns.shift();
+    }
 
     const valuesStartIndex = insertQuery.indexOf('VALUES') + 7;
     const valuesEndIndex = insertQuery.lastIndexOf(';');
@@ -210,7 +218,10 @@ export class AppComponent implements OnInit {
       .split(
         /(?<=\d+\s*),(?=\s*\d+)|(?<=\w*\s*')\s*,\s*(?='\s*\w*)|(?<=\d+\s*),\s*(?='\s*\w*)|(?<=\w*\s*')\s*,(?=\s*\d+)/gi
       );
-    valuesList.shift();
+
+    if (removeId) {
+      valuesList.shift();
+    }
 
     const trimmedValues = valuesList.map((val) => val.trim());
     const setClauses = trimmedColumns
@@ -246,13 +257,142 @@ export class AppComponent implements OnInit {
     }
   }
 
-  public editRawFile() {
+  public editRawFile(): void {
     this.store.updateEditingRawFile(true);
     this.store.updateQueryShow(this.store.queryText);
   }
 
-  public sanitize(url: string) {
+  public sanitize(url: string): SafeUrl {
     return this.sanitizer.bypassSecurityTrustUrl(url);
+  }
+
+  public handleSelectingQuery(): void {
+    this.httpClient
+      .get('assets/emails_emailscontent.sql', { responseType: 'text' })
+      .subscribe((queryText) => {
+        if (queryText) {
+          if (this.isSelectQuery) {
+            const tables: string[] = queryText
+              .split('INSERT INTO')
+              .map((value) => 'INSERT INTO' + value);
+            tables.shift();
+            this.store.updateQueryText('');
+
+            [...this.listQuerySelect].forEach(x => {
+              tables.forEach(value => {
+                if (value.includes(`VALUES (${x},`)) {
+                  let newValue = this.store.queryText;
+                  newValue += value;
+                  this.store.updateQueryText(newValue);
+                }
+              })
+            })
+            this.changeQueryShow('inset');
+            this.isSelectQuery = false;
+            this.store.updateEditingRawFile(false);
+          } else {
+            this.isSelectQuery = true;
+            const tables: string[] = queryText
+              .split('INSERT INTO')
+              .map((value) => 'INSERT INTO' + value);
+            tables.shift();
+            const listSelect: ITemplate[] = [];
+
+            tables.forEach((tableQuery) => {
+              const updateQuery = this.convertInsertToUpdate(tableQuery, false);
+              const htmlContent: string =
+                /(?<=htmlcontent\s*[`']\s*=\s*[`']).*(?='\s*,\s*[`']userID[`'])/gi.exec(
+                  updateQuery
+                )?.[0] ?? '';
+              const email: string =
+                /(?<=title\s*[`']\s*=\s*[`']).*(?='\s*,\s*[`']subject[`'])/gi.exec(
+                  updateQuery
+                )?.[0] ?? '';
+              const id: string =
+                /(?<=ID\s*[`']\s*=\s*[`']?).*(?=[`']?\s*,\s*[`']isVendor[`'])/gi.exec(
+                  updateQuery
+                )?.[0] ?? '';
+              const newTemplate: ITemplate = {
+                id: Number(id.trim()),
+                email: email,
+                htmlContent: htmlContent.replaceAll(/\\r\\n|\\/gi, ''),
+              };
+              listSelect.push(newTemplate);
+            });
+            this.listOptionQuery = listSelect;
+            if (this.listQuerySelect.size === 0) {
+              this.selectAll();
+            }
+          }
+        }
+      });
+  }
+
+  handleSearchChange(event: Event) {
+    let value = ''
+    if (event.target) {
+      value = (event.target as HTMLInputElement)?.value ?? '';
+      this.searchValue = value;
+    }
+    if (value.length > 0) {
+      this.searchResult = this.listOptionQuery.filter(x => x.email.toLocaleLowerCase().includes(value.toLocaleLowerCase()));
+      this.searchResult = this.searchResult || null;
+    } else {
+      this.searchResult = null;
+    }
+  }
+
+  get listOption() {
+    if (this.searchResult) {
+      return this.searchResult;
+    }
+    return this.listOptionQuery;
+  }
+
+  public handleClickOption(id: number): void {
+    if (this.listQuerySelect.has(id)) {
+      this.listQuerySelect.delete(id)
+    } else {
+      this.listQuerySelect.add(id)
+    }
+  }
+
+  public selectAll() {
+    if (this.searchResult) {
+      this.handleSelectSearchValue('select')
+    } else {
+      this.listQuerySelect.clear();
+      this.listOptionQuery.forEach(x => this.listQuerySelect.add(x.id))
+    }
+  }
+
+  public deselectAll() {
+    if (this.searchResult) {
+      this.handleSelectSearchValue('unSelect')
+    } else {
+      this.listQuerySelect.clear();
+    }
+  }
+
+  public handleSelectSearchValue(action: 'select' | 'unSelect'): void {
+    if (this.searchResult !== null) {
+      if (action === 'select') {
+        this.searchResult.forEach(x => {
+          if (!this.listQuerySelect.has(x.id)) {
+            this.listQuerySelect.add(x.id);
+          }
+        })
+      } else {
+        this.searchResult.forEach(x => {
+          this.listQuerySelect.delete(x.id)
+        })
+      }
+    }
+  }
+
+  public clearSearchValue(): void {
+    this.searchValue = '';
+    this.searchResult = null;
   }
 
   public capitalizeFirstCharacter (word: string) {
