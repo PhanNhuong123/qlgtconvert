@@ -1,26 +1,28 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { IProperties, ITemplate, properties } from './app.constant';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { EProperty, IProperty, ITemplate } from './app.constant';
+import { GlobalStore } from './store/global.store';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  providers: [GlobalStore]
 })
 export class AppComponent implements OnInit {
   title = 'email-content-tool';
-  public queryText: string = '';
-  public queryShow: string = '';
-  public properties: IProperties[] = properties;
-  public isProcess: boolean = false;
-  public editQuery: boolean = false;
-  public isQueryInset: boolean = true;
-  public isEditingRawFile: boolean = false;
-  public errorText = 'Error to convert raw file !';
-  public emailTemplates: ITemplate[] = [];
-  public isShowTemplate: boolean = false;
-  public emailTemplateIndex: number = 0;
+  // public queryText: string = '';
+  // public queryShow: string = '';
+  // public properties: IProperty[] = properties;
+  // public isProcess: boolean = false;
+  // public editQuery: boolean = false;
+  // public isQueryInset: boolean = true;
+  // public isEditingRawFile: boolean = false;
+  // public errorText = 'Error to convert raw file !';
+  // public emailTemplates: ITemplate[] = [];
+  // public isShowTemplate: boolean = false;
+  // public emailTemplateIndex: number = 0;
   public isSelectQuery: boolean = false;
   public listQuerySelect = new Set<number>();
   public listOptionQuery: ITemplate[] = [];
@@ -29,27 +31,48 @@ export class AppComponent implements OnInit {
 
   constructor(
     private httpClient: HttpClient,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private store: GlobalStore
   ) { }
+
+  EProperty = EProperty;
+
+  vm$ = this.store.select(state => {
+    return {
+      queryText: state.queryText,
+      queryShow: state.queryShow,
+      properties: state.properties,
+      isProcess: state.isProcess,
+      editQuery: state.editQuery,
+      isQueryInsert: state.isQueryInsert,
+      isEditingRawFile: state.isEditingRawFile,
+      errorText: state.errorText,
+      isShowTemplate: state.isShowTemplate,
+      emailTemplateIndex: state.emailTemplateIndex,
+      emailTemplates: state.emailTemplates
+    }
+  })
 
   ngOnInit(): void {
     this.httpClient
       .get('assets/emails_emailscontent.sql', { responseType: 'text' })
       .subscribe((res) => {
         if (res) {
-          this.queryText = res;
+          this.store.updateQueryText(res);
         }
       });
   }
 
-  public ChooseEmailTemplate(index: number): void {
-    this.emailTemplateIndex = index ?? 1;
+  public chooseEmailTemplate(index: number): void {
+    this.store.updateEmailTemplateIndex(index ?? 0);
   }
 
   public getListTemplate(): void {
-    this.emailTemplates.length = 0;
+    this.store.emailTemplates.length = 0;
     this.rePlaceKeyCode();
-    const tables: string[] = this.queryShow
+    console.log(this.store.queryShow);
+
+    const tables: string[] = this.store.queryShow
       .split('INSERT INTO')
       .map((value) => 'INSERT INTO' + value);
     tables.shift();
@@ -68,35 +91,40 @@ export class AppComponent implements OnInit {
         email: email,
         htmlContent: htmlContent.replaceAll(/\\r\\n|\\/gi, ''),
       };
-      this.emailTemplates.push(newTemplate);
+      this.store.updateEmailTemplates(newTemplate);
     });
   }
 
   public closeEmailTemplate(): void {
-    this.isShowTemplate = false;
+    this.store.updateShowTemplate(false);
   }
 
   public handleShowTemplate(): void {
-    this.isShowTemplate = true;
+    this.store.updateShowTemplate(true);
     this.getListTemplate();
   }
 
   public rePlaceKeyCode(): void {
-    let result = this.queryText;
-    this.properties.forEach((property) => {
+    let result = this.store.queryText;
+    this.store.properties.forEach((property) => {
+      console.log(property.propertyName);
+
       const keys = Object.keys(property).filter(
         (key) => key !== 'propertyName'
       );
       keys.forEach((key) => {
         if (key.trim().length >= 0) {
           result = result.replaceAll(
-            `##${property.propertyName + key}##`,
+            `##${property.propertyName + this.capitalizeFirstCharacter(key)}##`,
             property[key] ?? ''
           );
         }
       });
     });
-    this.queryShow = result;
+    // this.queryShow = result;
+    console.log(result);
+
+    this.store.updateQueryShow(result);
   }
 
   public processing(): void {
@@ -104,19 +132,19 @@ export class AppComponent implements OnInit {
       .get('assets/emails_emailscontent.sql', { responseType: 'text' })
       .subscribe((res) => {
         if (res) {
-          this.queryText = res;
+          this.store.updateQueryText(res);
           this.rePlaceKeyCode();
-          if (!this.isQueryInset) {
+          if (!this.store.isQueryInsert) {
             this.convertAllInsertToUpdate();
           }
           this.getListTemplate();
-          this.isProcess = true;
+          this.store.updateIsProcess(true);
           this.listQuerySelect.clear();
         }
       });
   }
 
-  public onInputChange(event: Event, property: IProperties, tap: string): void {
+  public onInputChange(event: Event, property: IProperty, tap: string): void {
     event.preventDefault();
     if (property[tap] !== undefined) {
       property[tap] = (event.target as HTMLInputElement)?.value ?? '';
@@ -124,41 +152,44 @@ export class AppComponent implements OnInit {
   }
 
   public copyQuery(): void {
-    navigator.clipboard.writeText(this.queryShow);
+    navigator.clipboard.writeText(this.store.queryShow);
     alert('copied !!');
   }
 
   public back() {
-    this.isProcess = false;
-    this.editQuery = false;
+    this.store.updateIsProcess(false);
+    this.store.updateEditQuery(false);
   }
 
   public handleQueyChange(event: Event): void {
     if (event.target) {
-      this.queryShow = (event.target as HTMLInputElement).value ?? '';
+      let value = (event.target as HTMLInputElement).value ?? '';
+      this.store.updateQueryShow(value);
     }
   }
 
   public closeEditQuery(): void {
-    this.editQuery = false;
-    if (this.isEditingRawFile) {
-      this.isEditingRawFile = false;
-      this.queryText = this.queryShow;
+    this.store.updateEditQuery(false);
+    if (this.store.isEditingRawFile) {
+      this.store.updateEditingRawFile(false);
+      this.store.updateQueryText(this.store.queryShow);
     }
   }
 
   public openEditQuery(): void {
-    this.editQuery = true;
+    this.store.updateEditQuery(true);
   }
 
   public convertAllInsertToUpdate(): void {
-    const tables: string[] = this.queryShow
+    const tables: string[] = this.store.queryShow
       .split('INSERT INTO')
       .map((value) => 'INSERT INTO' + value);
     tables.shift();
-    this.queryShow = '';
+    this.store.updateQueryShow('');
     tables.forEach((value) => {
-      this.queryShow += this.convertInsertToUpdate(value);
+      let newValue = this.store.queryShow;
+      newValue += this.convertInsertToUpdate(value);
+      this.store.updateQueryShow(newValue);
     });
   }
 
@@ -208,27 +239,27 @@ export class AppComponent implements OnInit {
   }
 
   public changeQueryShow(type: 'inset' | 'update'): void {
-    if (this.isEditingRawFile) {
-      this.isEditingRawFile = false;
-      this.queryText = this.queryShow;
+    if (this.store.isEditingRawFile) {
+      this.store.updateEditingRawFile(false);
+      this.store.updateQueryText(this.store.queryShow);
     }
 
     if (type === 'inset') {
-      this.isQueryInset = true;
+      this.store.updateQueryInsert(true);
       this.rePlaceKeyCode();
     } else if (type === 'update') {
-      this.isQueryInset = false;
+      this.store.updateQueryInsert(false);
       this.rePlaceKeyCode();
       this.convertAllInsertToUpdate();
     }
-    if (this.queryShow.trim().length === 0) {
-      this.queryShow = this.errorText;
+    if (this.store.queryShow.trim().length === 0) {
+      this.store.updateQueryShow(this.store.errorText);
     }
   }
 
   public editRawFile(): void {
-    this.isEditingRawFile = true;
-    this.queryShow = this.queryText;
+    this.store.updateEditingRawFile(true);
+    this.store.updateQueryShow(this.store.queryText);
   }
 
   public sanitize(url: string): SafeUrl {
@@ -245,18 +276,20 @@ export class AppComponent implements OnInit {
               .split('INSERT INTO')
               .map((value) => 'INSERT INTO' + value);
             tables.shift();
-            this.queryText = '';
+            this.store.updateQueryText('');
 
             [...this.listQuerySelect].forEach(x => {
               tables.forEach(value => {
                 if (value.includes(`VALUES (${x},`)) {
-                  this.queryText += value;
+                  let newValue = this.store.queryText;
+                  newValue += value;
+                  this.store.updateQueryText(newValue);
                 }
               })
             })
             this.changeQueryShow('inset');
             this.isSelectQuery = false;
-            this.isEditingRawFile = false;
+            this.store.updateEditingRawFile(false);
           } else {
             this.isSelectQuery = true;
             const tables: string[] = queryText
@@ -360,5 +393,10 @@ export class AppComponent implements OnInit {
   public clearSearchValue(): void {
     this.searchValue = '';
     this.searchResult = null;
+  }
+
+  public capitalizeFirstCharacter (word: string) {
+    const capitalized = word.charAt(0).toUpperCase() + word.slice(1)
+    return capitalized;
   }
 }

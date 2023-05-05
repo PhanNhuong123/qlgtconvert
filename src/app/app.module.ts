@@ -1,22 +1,26 @@
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { PushModule } from '@ngrx/component';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
+import { GlobalStore } from './store/global.store';
 
 @NgModule({
   declarations: [
     AppComponent,
-    SafeHtmlPipe
+    SafeHtmlPipe,
+
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    PushModule
   ],
-  providers: [],
+  providers: [GlobalStore],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
