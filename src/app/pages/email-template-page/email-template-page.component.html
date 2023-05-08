@@ -1,0 +1,31 @@
+<ng-container *ngIf="vm$ | ngrxPush as vm">
+  <div class="h-screen w-screen flex justify-center items-center relative">
+    <div
+      class="email-template-panel absolute flex justify-center items-center transition-all duration-500 z-50 shadow-md bg-slate-200 h-full w-full top-0 translate-y-full transform"
+      [ngClass]="{ '!translate-y-0': vm.isShowTemplate }">
+      <div *ngIf="vm.emailTemplates.length > 0" class="h-5/6 w-5/6 flex p-6 bg-white hover:shadow-md rounded-lg">
+        <div class="w-2/5 capitalize max-w-[400px] mr-2 pr-2 overflow-auto">
+          <div *ngFor="let emailTemplate of vm.emailTemplates; index as i">
+            <button (click)="chooseEmailTemplate(i)"
+              class="w-full my-0.5 px-5 py-2.5 font-medium bg-blue-50 hover:bg-blue-100 hover:text-blue-600 text-blue-500 rounded-lg text-sm"
+              [ngClass]="{'!bg-blue-500 !text-white': vm.emailTemplateIndex === i}">
+              {{ emailTemplate.email }}
+            </button>
+          </div>
+        </div>
+        <div class="flex-1 pl-2 border-l border-r border-gray-200">
+          <div [innerHTML]="
+            vm.emailTemplates[vm.emailTemplateIndex].htmlContent | safeHtml
+          "></div>
+        </div>
+        <div (click)="backToQueryPanel()"
+          class="absolute flex w-full justify-center cursor-pointer opacity-40 top-1 left-1/2 right-1/2 transition-all -translate-x-1/2 hover:opacity-100 hover:scale-125 hover:text-blue-500">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 256 256">
+            <path fill="currentColor"
+              d="M128 26a102 102 0 1 0 102 102A102.12 102.12 0 0 0 128 26Zm0 192a90 90 0 1 1 90-90a90.1 90.1 0 0 1-90 90Zm36.24-102.24a6 6 0 1 1-8.48 8.48L134 102.49V168a6 6 0 0 1-12 0v-65.51l-21.76 21.75a6 6 0 0 1-8.48-8.48l32-32a6 6 0 0 1 8.48 0Z" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

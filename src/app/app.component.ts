@@ -41,6 +41,7 @@ export class AppComponent implements OnInit {
   })
 
   ngOnInit(): void {
+
     this.httpClient
       .get('assets/emails_emailscontent.sql', { responseType: 'text' })
       .subscribe((res) => {
