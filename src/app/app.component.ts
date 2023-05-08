@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { EProperty, IProperty, ITemplate } from './app.constant';
 import { GlobalStore } from './store/global.store';
@@ -8,27 +8,9 @@ import { GlobalStore } from './store/global.store';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  providers: [GlobalStore]
 })
 export class AppComponent implements OnInit {
   title = 'email-content-tool';
-  // public queryText: string = '';
-  // public queryShow: string = '';
-  // public properties: IProperty[] = properties;
-  // public isProcess: boolean = false;
-  // public editQuery: boolean = false;
-  // public isQueryInset: boolean = true;
-  // public isEditingRawFile: boolean = false;
-  // public errorText = 'Error to convert raw file !';
-  // public emailTemplates: ITemplate[] = [];
-  // public isShowTemplate: boolean = false;
-  // public emailTemplateIndex: number = 0;
-  public isSelectQuery: boolean = false;
-  public listQuerySelect = new Set<number>();
-  public listOptionQuery: ITemplate[] = [];
-  public searchResult: ITemplate[] | null = null;
-  public searchValue: string = '';
-
   constructor(
     private httpClient: HttpClient,
     private sanitizer: DomSanitizer,
@@ -49,7 +31,12 @@ export class AppComponent implements OnInit {
       errorText: state.errorText,
       isShowTemplate: state.isShowTemplate,
       emailTemplateIndex: state.emailTemplateIndex,
-      emailTemplates: state.emailTemplates
+      emailTemplates: state.emailTemplates,
+      isSelectQuery: state.isSelectQuery,
+      searchValue: state.searchValue,
+      searchResult: state.searchResult,
+      listOptionQuery: state.listOptionQuery,
+      listQuerySelect: state.listQuerySelect
     }
   })
 
@@ -135,7 +122,7 @@ export class AppComponent implements OnInit {
           }
           this.getListTemplate();
           this.store.updateIsProcess(true);
-          this.listQuerySelect.clear();
+          this.store.clearListQuerySelect();
         }
       });
   }
@@ -267,15 +254,15 @@ export class AppComponent implements OnInit {
       .get('assets/emails_emailscontent.sql', { responseType: 'text' })
       .subscribe((queryText) => {
         if (queryText) {
-          if (this.isSelectQuery) {
-            this.store.updateListQuerySelect(this.listQuerySelect);
+          if (this.store.isSelectQuery) {
+            this.store.updateListQuerySelect(this.store.listQuerySelect);
             const tables: string[] = queryText
               .split('INSERT INTO')
               .map((value) => 'INSERT INTO' + value);
             tables.shift();
             this.store.updateQueryText('');
 
-            [...this.listQuerySelect].forEach(x => {
+            [...this.store.listQuerySelect].forEach(x => {
               tables.forEach(value => {
                 if (value.includes(`VALUES (${x},`)) {
                   let newValue = this.store.queryText;
@@ -285,11 +272,11 @@ export class AppComponent implements OnInit {
               })
             })
             this.changeQueryShow('insert');
-            this.isSelectQuery = false;
+            this.store.updateSelectQuery(false);
             this.store.updateEditingRawFile(false);
           } else {
-            this.isSelectQuery = true;
-            this.listQuerySelect = this.store.listQuerySelect;
+            this.store.updateSelectQuery(true);
+            this.store.updateListQuerySelect(this.store.listQuerySelect);
             const tables: string[] = queryText
               .split('INSERT INTO')
               .map((value) => 'INSERT INTO' + value);
@@ -317,8 +304,8 @@ export class AppComponent implements OnInit {
               };
               listSelect.push(newTemplate);
             });
-            this.listOptionQuery = listSelect;
-            if (this.listQuerySelect.size === 0) {
+            this.store.updateOptionQuery(listSelect);
+            if (this.store.listQuerySelect.size === 0) {
               this.selectAll();
             }
           }
@@ -330,67 +317,69 @@ export class AppComponent implements OnInit {
     let value = ''
     if (event.target) {
       value = (event.target as HTMLInputElement)?.value ?? '';
-      this.searchValue = value;
+      this.store.updateSearchValue(value);
     }
     if (value.length > 0) {
-      this.searchResult = this.listOptionQuery.filter(x => x.email.toLocaleLowerCase().includes(value.toLocaleLowerCase()));
-      this.searchResult = this.searchResult || null;
+      // this.searchResult =
+      // this.searchResult = this.searchResult || null;
+      let data = this.store.listOptionQuery.filter(x => x.email.toLocaleLowerCase().includes(value.toLocaleLowerCase()));
+      this.store.updateSearchResult(data);
     } else {
-      this.searchResult = null;
+      this.store.updateSearchResult([]);
     }
   }
 
   get listOption() {
-    if (this.searchResult) {
-      return this.searchResult;
+    if (this.store.searchResult.length > 0) {
+      return this.store.searchResult;
     }
-    return this.listOptionQuery;
+    return this.store.listOptionQuery;
   }
 
   public handleClickOption(id: number): void {
-    if (this.listQuerySelect.has(id)) {
-      this.listQuerySelect.delete(id)
+    if (this.store.listQuerySelect.has(id)) {
+      this.store.listQuerySelect.delete(id)
     } else {
-      this.listQuerySelect.add(id)
+      this.store.listQuerySelect.add(id)
     }
   }
 
   public selectAll() {
-    if (this.searchResult) {
+    if (this.store.searchResult.length > 0) {
       this.handleSelectSearchValue('select')
     } else {
-      this.listQuerySelect.clear();
-      this.listOptionQuery.forEach(x => this.listQuerySelect.add(x.id))
+      this.store.clearListQuerySelect();
+      this.store.listOptionQuery.forEach(x => this.store.listQuerySelect.add(x.id))
     }
   }
 
   public deselectAll() {
-    if (this.searchResult) {
+    if (this.store.searchResult.length > 0) {
       this.handleSelectSearchValue('deselect')
     } else {
-      this.listQuerySelect.clear();
+      this.store.clearListQuerySelect();
     }
   }
 
   public handleSelectSearchValue(action: 'select' | 'deselect'): void {
-    if (this.searchResult !== null) {
+    if (this.store.searchResult.length > 0) {
       if (action === 'select') {
-        this.searchResult.forEach(x => {
-          if (!this.listQuerySelect.has(x.id)) {
-            this.listQuerySelect.add(x.id);
+        this.store.searchResult.forEach(x => {
+          if (!this.store.listQuerySelect.has(x.id)) {
+            this.store.listQuerySelect.add(x.id);
           }
         })
       } else {
-        this.searchResult.forEach(x => {
-          this.listQuerySelect.delete(x.id)
+        this.store.searchResult.forEach(x => {
+          this.store.listQuerySelect.delete(x.id)
         })
       }
     }
   }
 
   public clearSearchValue(): void {
-    this.searchValue = '';
-    this.searchResult = null;
+    this.store.updateSearchValue('');
+    this.store.updateSearchResult([]);
   }
 
   public capitalizeFirstCharacter(word: string) {
@@ -399,6 +388,6 @@ export class AppComponent implements OnInit {
   }
 
   public closeSelectPage() {
-    this.isSelectQuery = false;
+    this.store.updateSelectQuery(false);
   }
 }
