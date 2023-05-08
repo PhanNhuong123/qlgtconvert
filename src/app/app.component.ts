@@ -70,7 +70,6 @@ export class AppComponent implements OnInit {
   public getListTemplate(): void {
     this.store.emailTemplates.length = 0;
     this.rePlaceKeyCode();
-    console.log(this.store.queryShow);
 
     const tables: string[] = this.store.queryShow
       .split('INSERT INTO')
@@ -107,7 +106,6 @@ export class AppComponent implements OnInit {
   public rePlaceKeyCode(): void {
     let result = this.store.queryText;
     this.store.properties.forEach((property) => {
-      console.log(property.propertyName);
 
       const keys = Object.keys(property).filter(
         (key) => key !== 'propertyName'
@@ -121,8 +119,6 @@ export class AppComponent implements OnInit {
         }
       });
     });
-    // this.queryShow = result;
-    console.log(result);
 
     this.store.updateQueryShow(result);
   }
@@ -238,13 +234,13 @@ export class AppComponent implements OnInit {
     return updateQuery;
   }
 
-  public changeQueryShow(type: 'inset' | 'update'): void {
+  public changeQueryShow(type: 'insert' | 'update'): void {
     if (this.store.isEditingRawFile) {
       this.store.updateEditingRawFile(false);
       this.store.updateQueryText(this.store.queryShow);
     }
 
-    if (type === 'inset') {
+    if (type === 'insert') {
       this.store.updateQueryInsert(true);
       this.rePlaceKeyCode();
     } else if (type === 'update') {
@@ -272,6 +268,7 @@ export class AppComponent implements OnInit {
       .subscribe((queryText) => {
         if (queryText) {
           if (this.isSelectQuery) {
+            this.store.updateListQuerySelect(this.listQuerySelect);
             const tables: string[] = queryText
               .split('INSERT INTO')
               .map((value) => 'INSERT INTO' + value);
@@ -287,11 +284,12 @@ export class AppComponent implements OnInit {
                 }
               })
             })
-            this.changeQueryShow('inset');
+            this.changeQueryShow('insert');
             this.isSelectQuery = false;
             this.store.updateEditingRawFile(false);
           } else {
             this.isSelectQuery = true;
+            this.listQuerySelect = this.store.listQuerySelect;
             const tables: string[] = queryText
               .split('INSERT INTO')
               .map((value) => 'INSERT INTO' + value);
@@ -368,13 +366,13 @@ export class AppComponent implements OnInit {
 
   public deselectAll() {
     if (this.searchResult) {
-      this.handleSelectSearchValue('unSelect')
+      this.handleSelectSearchValue('deselect')
     } else {
       this.listQuerySelect.clear();
     }
   }
 
-  public handleSelectSearchValue(action: 'select' | 'unSelect'): void {
+  public handleSelectSearchValue(action: 'select' | 'deselect'): void {
     if (this.searchResult !== null) {
       if (action === 'select') {
         this.searchResult.forEach(x => {
@@ -395,8 +393,12 @@ export class AppComponent implements OnInit {
     this.searchResult = null;
   }
 
-  public capitalizeFirstCharacter (word: string) {
+  public capitalizeFirstCharacter(word: string) {
     const capitalized = word.charAt(0).toUpperCase() + word.slice(1)
     return capitalized;
+  }
+
+  public closeSelectPage() {
+    this.isSelectQuery = false;
   }
 }

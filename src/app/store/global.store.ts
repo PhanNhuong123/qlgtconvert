@@ -21,7 +21,8 @@ const state = {
   isShowTemplate: false as boolean,
   errorText: 'Error to convert raw file !' as string,
   emailTemplates: [] as ITemplate[],
-  emailTemplateIndex: 0 as number
+  emailTemplateIndex: 0 as number,
+  listQuerySelect: new Set<number>()
 }
 
 type State = typeof state;
@@ -59,6 +60,9 @@ export class GlobalStore extends ComponentStore<State> {
 
   get isShowTemplate(): boolean { return this.get().isShowTemplate; }
   updateShowTemplate(value: boolean) { this.patchState({ isShowTemplate: value }); }
+
+  get listQuerySelect(): Set<number> { return this.get().listQuerySelect; }
+  updateListQuerySelect(value: Set<number>) { this.patchState({ listQuerySelect: value }); }
 
   get emailTemplates(): ITemplate[] { return this.get().emailTemplates; }
   updateEmailTemplates(newTemplate: ITemplate) {
