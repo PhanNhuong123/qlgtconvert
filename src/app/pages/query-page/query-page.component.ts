@@ -305,7 +305,12 @@ export class QueryPageComponent {
     const indexTrigger = trimmedColumns.findIndex(
       (value) => value === '`trigger`'
     );
-    const whereClauses = '`trigger`' + ' = ' + trimmedValues[indexTrigger];
+    const indexTopID = trimmedColumns.findIndex(
+      (value) => value === '`topID`'
+    );
+
+    let whereClauses = '`trigger`' + ' = ' + trimmedValues[indexTrigger];
+     whereClauses += ' && `topID`' + ' = ' + trimmedValues[indexTopID];
     updateQuery += ` WHERE ${whereClauses};`;
 
     return updateQuery;
