@@ -16,13 +16,17 @@ const state = {
   queryShow: '' as string,
   isProcess: false as boolean,
   editQuery: false as boolean,
-  isQueryInsert: false as boolean,
+  isQueryInsert: true as boolean,
   isEditingRawFile: false as boolean,
   isShowTemplate: false as boolean,
   errorText: 'Error to convert raw file !' as string,
   emailTemplates: [] as ITemplate[],
   emailTemplateIndex: 0 as number,
-  listQuerySelect: new Set<number>()
+  listQuerySelect: new Set<number>(),
+  isSelectQuery: false as boolean,
+  searchValue: '' as string,
+  searchResult: [] as ITemplate[],
+  listOptionQuery: [] as ITemplate[]
 }
 
 type State = typeof state;
@@ -63,12 +67,36 @@ export class GlobalStore extends ComponentStore<State> {
 
   get listQuerySelect(): Set<number> { return this.get().listQuerySelect; }
   updateListQuerySelect(value: Set<number>) { this.patchState({ listQuerySelect: value }); }
+  clearListQuerySelect() {
+    this.patchState({
+      listQuerySelect: new Set<number>()
+    })
+  }
 
   get emailTemplates(): ITemplate[] { return this.get().emailTemplates; }
   updateEmailTemplates(newTemplate: ITemplate) {
     this.patchState({
       emailTemplates: [...this.emailTemplates, newTemplate]
+    });
+  }
+
+  get isSelectQuery(): boolean { return this.get().isSelectQuery; }
+  updateSelectQuery(value: boolean) { this.patchState({ isSelectQuery: value }); }
+
+  get searchValue(): string { return this.get().searchValue; }
+  updateSearchValue(value: string) { this.patchState({ searchValue: value }); }
+
+  get searchResult() { return this.get().searchResult; }
+  updateSearchResult(data: ITemplate[]) {
+    this.patchState({
+      searchResult: [...data]
     })
   }
 
+  get listOptionQuery(): ITemplate[] { return this.get().listOptionQuery; }
+  updateOptionQuery(options: ITemplate[]) {
+    this.patchState({
+      listOptionQuery: [...this.listOptionQuery, ...options ]
+    })
+  }
 }
