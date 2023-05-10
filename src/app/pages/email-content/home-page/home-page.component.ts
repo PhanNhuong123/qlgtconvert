@@ -1,9 +1,9 @@
+import { EmailContentStore } from './../email-content.store';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { EProperty, IProperty, ITemplate } from 'src/app/app.constant';
-import { GlobalStore } from 'src/app/store/global.store';
 
 @Component({
   selector: 'app-home-page',
@@ -12,11 +12,11 @@ import { GlobalStore } from 'src/app/store/global.store';
 })
 export class HomePageComponent {
 
-  constructor(private httpClient: HttpClient, private sanitizer: DomSanitizer, private store: GlobalStore, private router: Router) { }
+  constructor(private httpClient: HttpClient, private sanitizer: DomSanitizer, private emailContentStore: EmailContentStore, private router: Router) { }
 
   EProperty = EProperty;
 
-  vm$ = this.store.select(state => {
+  vm$ = this.emailContentStore.select(state => {
     return {
       properties: state.properties,
     }
@@ -39,22 +39,22 @@ export class HomePageComponent {
       .get('assets/emails_emailscontent.sql', { responseType: 'text' })
       .subscribe((res) => {
         if (res) {
-          this.store.updateQueryText(res);
+          this.emailContentStore.updateQueryText(res);
           this.rePlaceKeyCode();
-          if (!this.store.isQueryInsert) {
+          if (!this.emailContentStore.isQueryInsert) {
             this.convertAllInsertToUpdate();
           }
           this.getListTemplate();
-          this.store.updateIsProcess(true);
-          this.store.clearListQuerySelect();
+          this.emailContentStore.updateIsProcess(true);
+          this.emailContentStore.clearListQuerySelect();
         }
       });
     this.router.navigateByUrl("/query");
   }
 
   public rePlaceKeyCode(): void {
-    let result = this.store.queryText;
-    this.store.properties.forEach((property) => {
+    let result = this.emailContentStore.queryText;
+    this.emailContentStore.properties.forEach((property) => {
 
       const keys = Object.keys(property).filter(
         (key) => key !== 'propertyName'
@@ -69,24 +69,24 @@ export class HomePageComponent {
       });
     });
 
-    this.store.updateQueryShow(result);
+    this.emailContentStore.updateQueryShow(result);
   }
 
-  public capitalizeFirstCharacter(word: string) {
+  public capitalizeFirstCharacter(word: string): string {
     const capitalized = word.charAt(0).toUpperCase() + word.slice(1);
     return capitalized;
   }
 
   public convertAllInsertToUpdate(): void {
-    const tables: string[] = this.store.queryShow
+    const tables: string[] = this.emailContentStore.queryShow
       .split('INSERT INTO')
       .map((value) => 'INSERT INTO' + value);
     tables.shift();
-    this.store.updateQueryShow('');
+    this.emailContentStore.updateQueryShow('');
     tables.forEach((value) => {
-      let newValue = this.store.queryShow;
+      let newValue = this.emailContentStore.queryShow;
       newValue += this.convertInsertToUpdate(value);
-      this.store.updateQueryShow(newValue);
+      this.emailContentStore.updateQueryShow(newValue);
     });
   }
 
@@ -136,10 +136,10 @@ export class HomePageComponent {
   }
 
   public getListTemplate(): void {
-    this.store.emailTemplates.length = 0;
+    this.emailContentStore.emailTemplates.length = 0;
     this.rePlaceKeyCode();
 
-    const tables: string[] = this.store.queryShow
+    const tables: string[] = this.emailContentStore.queryShow
       .split('INSERT INTO')
       .map((value) => 'INSERT INTO' + value);
     tables.shift();
@@ -158,7 +158,7 @@ export class HomePageComponent {
         email: email,
         htmlContent: htmlContent.replaceAll(/\\r\\n|\\/gi, ''),
       };
-      this.store.updateEmailTemplates(newTemplate);
+      this.emailContentStore.updateEmailTemplates(newTemplate);
     });
   }
 }

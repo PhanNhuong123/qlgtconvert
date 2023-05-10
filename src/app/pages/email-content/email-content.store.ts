@@ -1,6 +1,6 @@
 import { ComponentStore } from '@ngrx/component-store';
-import { IProperty, ITemplate } from "../app.constant";
 import { Injectable } from '@angular/core';
+import { IProperty, ITemplate } from 'src/app/app.constant';
 
 const state = {
   properties: [
@@ -32,7 +32,7 @@ const state = {
 type State = typeof state;
 
 @Injectable()
-export class GlobalStore extends ComponentStore<State> {
+export class EmailContentStore extends ComponentStore<State> {
   constructor() {
     super(state);
   }

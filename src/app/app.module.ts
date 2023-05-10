@@ -6,10 +6,9 @@ import { PushModule } from '@ngrx/component';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
-import { GlobalStore } from './store/global.store';
-import { HomePageComponent } from './pages/home-page/home-page.component';
-import { QueryPageComponent } from './pages/query-page/query-page.component';
-import { EmailTemplatePageComponent } from './pages/email-template-page/email-template-page.component';
+import { ContentComponent, EmailContentComponent, EmailTemplateBuilderComponent, EmailTemplatePageComponent, HomePageComponent, PropertiesSidebarComponent, QueryPageComponent } from './pages/index';
+
+import { AddNewElementModalComponent, LoadingComponent } from './shared/index';
 
 @NgModule({
   declarations: [
@@ -18,7 +17,12 @@ import { EmailTemplatePageComponent } from './pages/email-template-page/email-te
     HomePageComponent,
     QueryPageComponent,
     EmailTemplatePageComponent,
-
+    EmailContentComponent,
+    EmailTemplateBuilderComponent,
+    ContentComponent,
+    PropertiesSidebarComponent,
+    AddNewElementModalComponent,
+    LoadingComponent,
   ],
   imports: [
     BrowserModule,
@@ -26,7 +30,7 @@ import { EmailTemplatePageComponent } from './pages/email-template-page/email-te
     HttpClientModule,
     PushModule
   ],
-  providers: [GlobalStore],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

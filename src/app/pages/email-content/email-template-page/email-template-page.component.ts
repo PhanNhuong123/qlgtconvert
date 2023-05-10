@@ -1,19 +1,19 @@
+import { EmailContentStore } from './../email-content.store';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { EProperty } from 'src/app/app.constant';
-import { GlobalStore } from 'src/app/store/global.store';
 
 @Component({
   selector: 'app-email-template-page',
   templateUrl: './email-template-page.component.html',
-  styleUrls: ['./email-template-page.component.scss']
+  styleUrls: ['./email-template-page.component.scss'],
 })
 export class EmailTemplatePageComponent {
-  constructor(private store: GlobalStore, private router: Router) { }
+  constructor(private emailContentStore: EmailContentStore, private router: Router) { }
 
   EProperty = EProperty;
 
-  vm$ = this.store.select(state => {
+  vm$ = this.emailContentStore.select(state => {
     return {
       isShowTemplate: state.isShowTemplate,
       emailTemplates: state.emailTemplates,
@@ -22,11 +22,15 @@ export class EmailTemplatePageComponent {
   });
 
   public chooseEmailTemplate(index: number): void {
-    this.store.updateEmailTemplateIndex(index ?? 0);
+    this.emailContentStore.updateEmailTemplateIndex(index ?? 0);
   }
 
   public backToQueryPanel(): void {
-    this.store.updateShowTemplate(false);
+    this.emailContentStore.updateShowTemplate(false);
     this.router.navigateByUrl("/query");
+  }
+
+  public openEdit() {
+    this.router.navigateByUrl('/edit')
   }
 }

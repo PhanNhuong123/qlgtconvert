@@ -1,0 +1,100 @@
+<ng-container *ngIf="vm$ | async as vm">
+  <!-- <app-loading [showLoading]="vm.showLoading"></app-loading> -->
+  <div *ngIf="vm.showAddNewElementModal"
+    class="absolute bg-black/50 w-full h-screen z-50 flex justify-center items-start"
+    (click)="toggleAddNewElementModal($event)">
+    <div #container id="item" class="w-1/2 h-1/2 bg-white mt-24 rounded-lg">
+      <app-add-new-element-modal></app-add-new-element-modal>
+    </div>
+  </div>
+
+  <div class="h-screen flex flex-1 overflow-hidden bg-default">
+    <nav class="flex w-fit h-screen px-2 py-5 bg-nav relative">
+      <div class="space-y-1">
+        <button (click)="addImage()"
+          class="relative flex items-center text-sm font-medium rounded-md mt-[20px] w-[50px] h-[50px] cur">
+          <svg class="hover:bg-gray-300 h-fit w-fit rounded-sm" width="50" height="50" viewBox="0 0 50 50" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.5" y="0.5" width="49" height="49" rx="4.5" fill="none" />
+            <path
+              d="M21.75 21.628H21.75C21.7495 21.7096 21.7653 21.7905 21.7964 21.866C21.8271 21.9407 21.8723 22.0087 21.9293 22.0659C22.0494 22.1823 22.2096 22.2482 22.3769 22.25C22.542 22.2495 22.7002 22.1837 22.8169 22.067C22.8169 22.0669 22.8169 22.0669 22.817 22.0669M21.75 21.628L23.1705 20.8295C23.3815 21.0405 23.5 21.3266 23.5 21.625C23.5 21.9234 23.3815 22.2095 23.1705 22.4205L22.817 22.0669M21.75 21.628V21.625C21.75 21.4592 21.8158 21.3003 21.933 21.1831M21.75 21.628L21.933 21.1831M22.817 22.0669C22.9342 21.9497 23 21.7908 23 21.625C23 21.4592 22.9342 21.3003 22.817 21.1831M22.817 22.0669V21.1831M22.817 21.1831C22.8169 21.1831 22.8169 21.1831 22.8169 21.183M22.817 21.1831L22.8169 21.183M22.8169 21.183C22.6997 21.0658 22.5408 21 22.375 21C22.2092 21 22.0503 21.0658 21.9331 21.183C21.9331 21.1831 21.9331 21.1831 21.933 21.1831M22.8169 21.183L21.933 21.1831M16.7929 16.7929L16.7929 16.7929C16.9804 16.6054 17.2348 16.5 17.5 16.5H32.5C32.7652 16.5 33.0196 16.6054 33.2071 16.7929L33.5591 16.4409L33.2071 16.7929C33.3947 16.9804 33.5 17.2348 33.5 17.5V28V32.5C33.5 32.7652 33.3946 33.0196 33.2071 33.2071C33.0196 33.3946 32.7652 33.5 32.5 33.5H17.5C17.2348 33.5 16.9804 33.3947 16.7929 33.2071L16.4409 33.5591L16.7929 33.2071C16.6054 33.0196 16.5 32.7652 16.5 32.5V17.5C16.5 17.2348 16.6054 16.9804 16.7929 16.7929ZM33 17.5V17H32.5H17.5H17V17.5V27.6906V28.8977L17.8536 28.0442L19.7915 26.1062C19.7919 26.1058 19.7923 26.1054 19.7927 26.105C19.9814 25.9197 20.2354 25.8158 20.5 25.8158C20.7646 25.8158 21.0186 25.9197 21.2073 26.105C21.2077 26.1054 21.2081 26.1058 21.2085 26.1062L23.1464 28.0442L23.5 28.3977L23.8536 28.0442L28.0415 23.8562C28.0419 23.8558 28.0423 23.8554 28.0428 23.855C28.2315 23.6696 28.4855 23.5658 28.75 23.5658C29.0145 23.5658 29.2685 23.6696 29.4572 23.855C29.4577 23.8554 29.4581 23.8558 29.4585 23.8562L32.1464 26.5442L33 27.3977V26.1906V17.5ZM32.5 33H33V32.5V28.3094V28.1023L32.8536 27.9558L29.1036 24.2058L28.75 23.8523L28.3964 24.2058L24.2084 28.3939C24.208 28.3943 24.2076 28.3947 24.2072 28.3951C24.0185 28.5804 23.7646 28.6842 23.5 28.6842C23.2354 28.6842 22.9814 28.5804 22.7927 28.395C22.7923 28.3946 22.792 28.3942 22.7916 28.3939L20.8536 26.4558L20.5 26.1023L20.1464 26.4558L17.1464 29.4558L17 29.6023V29.8094V32.5V33H17.5H32.5Z"
+              stroke="#374151" />
+            <rect x="0.5" y="0.5" width="49" height="49" rx="4.5" stroke="#CCCCCC" />
+          </svg>
+        </button>
+        <button (click)="addText()"
+          class="relative flex items-center text-sm font-medium rounded-md mt-[20px] w-[50px] h-[50px]">
+          <svg class="hover:bg-gray-300 h-fit w-fit rounded-sm" width="50" height="50" viewBox="0 0 50 50" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.5" y="0.5" width="49" height="49" rx="4.5" fill="none" />
+            <path d="M18 17.5V20.5H23.5V32.5H26.5V20.5H32V17.5H18Z" fill="#374151" />
+            <rect x="0.5" y="0.5" width="49" height="49" rx="4.5" stroke="#CCCCCC" />
+          </svg>
+        </button>
+        <button class="relative flex items-center text-sm font-medium rounded-md mt-[20px] w-[50px] h-[50px]">
+          <svg class="hover:bg-gray-300 h-fit w-fit rounded-sm" width="50" height="50" viewBox="0 0 50 50" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.5" y="0.5" width="49" height="49" rx="4.5" fill="none" />
+            <path
+              d="M16.9 25C16.9 23.29 18.29 21.9 20 21.9H24V20H20C17.24 20 15 22.24 15 25C15 27.76 17.24 30 20 30H24V28.1H20C18.29 28.1 16.9 26.71 16.9 25ZM21 26H29V24H21V26ZM30 20H26V21.9H30C31.71 21.9 33.1 23.29 33.1 25C33.1 26.71 31.71 28.1 30 28.1H26V30H30C32.76 30 35 27.76 35 25C35 22.24 32.76 20 30 20Z"
+              fill="#374151" />
+            <rect x="0.5" y="0.5" width="49" height="49" rx="4.5" stroke="#CCCCCC" />
+          </svg>
+        </button>
+        <button (click)="addButton()"
+          class="relative flex items-center text-sm font-medium rounded-md mt-[20px] w-[50px] h-[50px]">
+          <svg class="hover:bg-gray-300 h-fit w-fit rounded-sm" width="50" height="50" viewBox="0 0 50 50" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.5" y="0.5" width="49" height="49" rx="4.5" fill="none" />
+            <path
+              d="M25.8 19.4C27.568 19.4 28.9999 20.832 28.9999 22.6C28.9999 23.8 28.36 24.816 27.4 25.368V24.3921C27.888 23.952 28.2 23.3121 28.2 22.6C28.2 21.272 27.1279 20.2 25.8 20.2C24.472 20.2 23.4 21.272 23.4 22.6C23.4 23.3121 23.712 23.952 24.1999 24.3921V25.368C23.2399 24.816 22.6 23.8 22.6 22.6C22.6 20.832 24.0319 19.4 25.8 19.4ZM31.3999 31.8C31.3759 32.456 30.856 32.976 30.1999 33H25.8C25.4959 33 25.2079 32.88 25 32.656L21.7999 29.296L22.392 28.68C22.5439 28.512 22.7599 28.4241 22.9999 28.4241H23.16L25 29.8V22.6C25 22.1601 25.36 21.8001 25.8 21.8001C26.2399 21.8001 26.5999 22.1601 26.5999 22.6V26.176L27.568 26.28L30.72 28.032C31.144 28.224 31.3999 28.648 31.3999 29.112V31.8ZM31.3999 17H18.6C17.72 17 17 17.72 17 18.6V25C17 25.4243 17.1686 25.8313 17.4686 26.1313C17.7686 26.4315 18.1756 26.6001 18.6 26.6001H21.7999V25H18.6V18.6H31.3999V25H29.8V26.6001H31.3999V26.568L31.432 26.6001C32.304 26.6001 33 25.872 33 25V18.6C33 18.1756 32.8314 17.7686 32.5313 17.4686C32.2313 17.1686 31.8243 17 31.3999 17Z"
+              fill="#374151" />
+            <rect x="0.5" y="0.5" width="49" height="49" rx="4.5" stroke="#CCCCCC" />
+          </svg>
+        </button>
+      </div>
+    </nav>
+    <div class="email-builder w-full h-full flex flex-col relative">
+      <div class="w-full flex relative justify-between border-b border-gray-200">
+        <div class="inline-block py-2 px-4 text-blue-700 border-b border-blue-700 font-normal">
+          Email Builder
+        </div>
+        <div class="space-x-3 flex justify-center items-center mr-2">
+          <button (click)="togglePreview()" class="hover:text-slate-400">Preview</button>
+          <button (click)="exportFile()" class="hover:text-slate-400">Export</button>
+          <button (click)="fileInput.click()" class="hover:bg-slate-200 rounded ">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M17.5125 10.53C17.2606 9.25329 16.5732 8.10364 15.5678 7.27743C14.5624 6.45122 13.3013 5.99971 12 6C9.8325 6 7.95 7.23 7.0125 9.03C5.91018 9.14912 4.89075 9.67141 4.15012 10.4965C3.40948 11.3216 2.99987 12.3913 3 13.5C3 15.9825 5.0175 18 7.5 18H17.25C19.32 18 21 16.32 21 14.25C21 12.27 19.4625 10.665 17.5125 10.53ZM17.25 16.5H7.5C5.8425 16.5 4.5 15.1575 4.5 13.5C4.5 11.9625 5.6475 10.68 7.17 10.5225L7.9725 10.44L8.3475 9.7275C8.69241 9.05608 9.2159 8.49286 9.86034 8.09985C10.5048 7.70683 11.2452 7.49926 12 7.5C13.965 7.5 15.66 8.895 16.0425 10.8225L16.2675 11.9475L17.415 12.03C17.9788 12.0679 18.5073 12.318 18.8942 12.7299C19.281 13.1418 19.4975 13.6849 19.5 14.25C19.5 15.4875 18.4875 16.5 17.25 16.5ZM9 12.75H10.9125V15H13.0875V12.75H15L12 9.75L9 12.75Z"
+                fill="#6B7280" />
+            </svg>
+          </button>
+          <button (click)="saveTemplate()" title="Save" class="hover:bg-slate-200 rounded ">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M18.2222 20H5.77778C5.30628 20 4.8541 19.8127 4.5207 19.4793C4.1873 19.1459 4 18.6937 4 18.2222V5.77778C4 5.30628 4.1873 4.8541 4.5207 4.5207C4.8541 4.1873 5.30628 4 5.77778 4H15.5556L20 8.44444V18.2222C20 18.6937 19.8127 19.1459 19.4793 19.4793C19.1459 19.8127 18.6937 20 18.2222 20Z"
+                stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M16.4446 19.9998V12.8887H7.55566V19.9998" stroke="#6B7280" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M7.55566 4V8.44444H14.6668" stroke="#6B7280" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+        <input type="file" #fileInput style="display: none" accept="text/html" (change)="onFileSelected($event)" />
+      </div>
+      <div class="flex relative ">
+        <router-outlet></router-outlet>
+
+        <app-properties-sidebar [itemElement]="vm.activeItem" [showPropertiesSidebar]="vm.showPropertiesSidebar"></app-properties-sidebar>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="preview" class="absolute top-0 z-20 w-full h-full bg-gray-200 flex justify-center">
+    <button (click)="togglePreview()" class="absolute right-2 top-1">
+      Close
+    </button>
+    <div [innerHTML]="getSafeHtml(vm.htmlTemplate)" class="overflow-y-auto mt-2"></div>
+  </div>
+</ng-container>
