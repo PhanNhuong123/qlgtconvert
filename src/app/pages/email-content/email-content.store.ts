@@ -26,7 +26,8 @@ const state = {
   isSelectQuery: false as boolean,
   searchValue: '' as string,
   searchResult: [] as ITemplate[],
-  listOptionQuery: [] as ITemplate[]
+  listOptionQuery: [] as ITemplate[],
+  htmlContent: '' as string
 }
 
 type State = typeof state;
@@ -97,6 +98,13 @@ export class EmailContentStore extends ComponentStore<State> {
   updateOptionQuery(options: ITemplate[]) {
     this.patchState({
       listOptionQuery: [...this.listOptionQuery, ...options ]
+    })
+  }
+
+  get htmlContent(): string { return this.get().htmlContent; }
+  updateHTMLContent(value: string) {
+    this.patchState({
+      htmlContent: value
     })
   }
 }

@@ -30,7 +30,8 @@ export class EmailTemplatePageComponent {
     this.router.navigateByUrl("/query");
   }
 
-  public openEdit() {
+  public openEdit(htmlContent: string) {
+    this.emailContentStore.updateHTMLContent(htmlContent);
     this.router.navigateByUrl('/edit')
   }
 }

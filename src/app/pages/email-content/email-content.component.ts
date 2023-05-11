@@ -5,7 +5,6 @@ import { EmailContentStore } from './email-content.store';
   selector: 'app-email-content',
   templateUrl: './email-content.component.html',
   styleUrls: ['./email-content.component.scss'],
-  providers: [EmailContentStore]
 })
 export class EmailContentComponent {
 

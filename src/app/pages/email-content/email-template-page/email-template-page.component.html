@@ -17,7 +17,7 @@
           <div [innerHTML]="
             vm.emailTemplates[vm.emailTemplateIndex].htmlContent | safeHtml
           "></div>
-          <button (click)="openEdit()" class="absolute bottom-0 left-1/2 -translate-x-1/2 px-5 py-2.5 font-medium bg-blue-50 hover:bg-blue-100 hover:text-blue-600 text-blue-500 rounded-lg text-sm">Edit template</button>
+          <button (click)="openEdit(vm.emailTemplates[vm.emailTemplateIndex].htmlContent)" class="absolute bottom-0 left-1/2 -translate-x-1/2 px-5 py-2.5 font-medium bg-blue-50 hover:bg-blue-100 hover:text-blue-600 text-blue-500 rounded-lg text-sm">Edit template</button>
         </div>
         <div (click)="backToQueryPanel()"
           class="absolute flex w-full justify-center cursor-pointer opacity-40 top-1 left-1/2 right-1/2 transition-all -translate-x-1/2 hover:opacity-100 hover:scale-125 hover:text-blue-500">

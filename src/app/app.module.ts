@@ -9,6 +9,8 @@ import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { ContentComponent, EmailContentComponent, EmailTemplateBuilderComponent, EmailTemplatePageComponent, HomePageComponent, PropertiesSidebarComponent, QueryPageComponent } from './pages/index';
 
 import { AddNewElementModalComponent, LoadingComponent } from './shared/index';
+import { EmailContentStore } from './pages/email-content/email-content.store';
+import { EmailTemplateBuilderStore } from './pages/email-template-builder/email-template.store';
 
 @NgModule({
   declarations: [
@@ -30,7 +32,7 @@ import { AddNewElementModalComponent, LoadingComponent } from './shared/index';
     HttpClientModule,
     PushModule
   ],
-  providers: [],
+  providers: [EmailTemplateBuilderStore, EmailContentStore],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

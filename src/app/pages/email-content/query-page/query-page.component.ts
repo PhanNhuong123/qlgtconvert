@@ -198,7 +198,14 @@ export class QueryPageComponent {
     this.emailContentStore.updateSearchValue('');
     this.emailContentStore.updateSearchResult([]);
   }
+
+  temp = new Set<number>();
   public handleClickOption(id: number): void {
+
+
+
+    this.temp.add(id);
+
     if (this.emailContentStore.listQuerySelect.has(id)) {
       this.emailContentStore.listQuerySelect.delete(id)
     } else {

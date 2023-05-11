@@ -1,14 +1,14 @@
-import { Component, Renderer2, ViewEncapsulation } from '@angular/core';
+import { Component, Renderer2, ViewEncapsulation, OnInit } from '@angular/core';
 import { EmailTemplateBuilderStore } from './email-template.store';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { EmailContentStore } from '../email-content/email-content.store';
 
 @Component({
   selector: 'app-email-template-builder',
   templateUrl: './email-template-builder.component.html',
   styleUrls: ['./email-template-builder.component.scss'],
-  providers: [EmailTemplateBuilderStore],
 })
-export class EmailTemplateBuilderComponent {
+export class EmailTemplateBuilderComponent implements OnInit {
   preview: boolean = false;
   vm$ = this.emailTemplateBuilderStore.select((state) => {
     return {
@@ -25,8 +25,13 @@ export class EmailTemplateBuilderComponent {
   constructor(
     private emailTemplateBuilderStore: EmailTemplateBuilderStore,
     private sanitizer: DomSanitizer,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private emailContentStore: EmailContentStore
   ) {}
+
+  ngOnInit(): void {
+    this.generateTemplateByHTMLString(this.emailContentStore.htmlContent);
+  }
 
   saveTemplate() {
     this.emailTemplateBuilderStore.saveTemplate();
@@ -91,5 +96,14 @@ export class EmailTemplateBuilderComponent {
 
   addImage() {
     this.emailTemplateBuilderStore.addImage();
+  }
+
+  generateTemplateByHTMLString(value: string) {
+    this.emailTemplateBuilderStore.patchState({
+      bodyItem: this.emailTemplateBuilderStore.convertHtmlToBodyItems(
+        value,
+        this.renderer
+      ),
+    });
   }
 }
