@@ -13,6 +13,8 @@ import { EProperty, ITemplate } from 'src/app/app.constant';
 export class QueryPageComponent {
   constructor(private emailContentStore: EmailContentStore, private httpClient: HttpClient, private router: Router) { }
 
+  public listQuerySelect = new Set<number>();
+
   EProperty = EProperty;
 
   vm$ = this.emailContentStore.select(state => {
@@ -64,28 +66,27 @@ export class QueryPageComponent {
       .subscribe((queryText) => {
         if (queryText) {
           if (this.emailContentStore.isSelectQuery) {
-            this.emailContentStore.updateListQuerySelect(this.emailContentStore.listQuerySelect);
+            this.emailContentStore.updateListQuerySelect(this.listQuerySelect);
             const tables: string[] = queryText
               .split('INSERT INTO')
               .map((value) => 'INSERT INTO' + value);
             tables.shift();
             this.emailContentStore.updateQueryText('');
-
-            [...this.emailContentStore.listQuerySelect].forEach(x => {
+            let newValue = '';
+            [...this.listQuerySelect].forEach(x => {
               tables.forEach(value => {
                 if (value.includes(`VALUES (${x},`)) {
-                  let newValue = this.emailContentStore.queryText;
                   newValue += value;
-                  this.emailContentStore.updateQueryText(newValue);
                 }
               })
             })
+            this.emailContentStore.updateQueryText(newValue);
             this.changeQueryShow('insert');
             this.emailContentStore.updateSelectQuery(false);
             this.emailContentStore.updateEditingRawFile(false);
           } else {
+            this.listQuerySelect = new Set(this.emailContentStore.listQuerySelect);
             this.emailContentStore.updateSelectQuery(true);
-            this.emailContentStore.updateListQuerySelect(this.emailContentStore.listQuerySelect);
             const tables: string[] = queryText
               .split('INSERT INTO')
               .map((value) => 'INSERT INTO' + value);
@@ -114,13 +115,18 @@ export class QueryPageComponent {
               listSelect.push(newTemplate);
             });
             this.emailContentStore.updateOptionQuery(listSelect);
-            if (this.emailContentStore.listQuerySelect.size === 0) {
+            if (this.listQuerySelect.size === 0) {
               this.selectAll();
             }
           }
         }
       });
   }
+
+  public cancelQuerySelect() {
+    this.emailContentStore.updateSelectQuery(false);
+  }
+
   public changeQueryShow(type: 'insert' | 'update'): void {
     if (this.emailContentStore.isEditingRawFile) {
       this.emailContentStore.updateEditingRawFile(false);
@@ -167,7 +173,7 @@ export class QueryPageComponent {
       this.handleSelectSearchValue('select')
     } else {
       this.emailContentStore.clearListQuerySelect();
-      this.emailContentStore.listOptionQuery.forEach(x => this.emailContentStore.listQuerySelect.add(x.id))
+      this.emailContentStore.listOptionQuery.forEach(x => this.listQuerySelect.add(x.id))
     }
   }
 
@@ -175,7 +181,7 @@ export class QueryPageComponent {
     if (this.emailContentStore.searchResult.length > 0) {
       this.handleSelectSearchValue('deselect')
     } else {
-      this.emailContentStore.clearListQuerySelect();
+      this.listQuerySelect.clear();
     }
   }
 
@@ -183,13 +189,13 @@ export class QueryPageComponent {
     if (this.emailContentStore.searchResult.length > 0) {
       if (action === 'select') {
         this.emailContentStore.searchResult.forEach(x => {
-          if (!this.emailContentStore.listQuerySelect.has(x.id)) {
-            this.emailContentStore.listQuerySelect.add(x.id);
+          if (!this.listQuerySelect.has(x.id)) {
+            this.listQuerySelect.add(x.id);
           }
         })
       } else {
         this.emailContentStore.searchResult.forEach(x => {
-          this.emailContentStore.listQuerySelect.delete(x.id)
+          this.listQuerySelect.delete(x.id);
         })
       }
     }
@@ -199,17 +205,11 @@ export class QueryPageComponent {
     this.emailContentStore.updateSearchResult([]);
   }
 
-  temp = new Set<number>();
   public handleClickOption(id: number): void {
-
-
-
-    this.temp.add(id);
-
-    if (this.emailContentStore.listQuerySelect.has(id)) {
-      this.emailContentStore.listQuerySelect.delete(id)
+    if (this.listQuerySelect.has(id)) {
+      this.listQuerySelect.delete(id);
     } else {
-      this.emailContentStore.listQuerySelect.add(id)
+      this.listQuerySelect.add(id);
     }
   }
 
