@@ -84,7 +84,6 @@ export class QueryPageComponent {
             this.store.updateEditingRawFile(false);
           } else {
             this.store.updateSelectQuery(true);
-            this.store.updateListQuerySelect(this.store.listQuerySelect);
             const tables: string[] = queryText
               .split('INSERT INTO')
               .map((value) => 'INSERT INTO' + value);

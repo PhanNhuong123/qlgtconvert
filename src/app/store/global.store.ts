@@ -96,7 +96,7 @@ export class GlobalStore extends ComponentStore<State> {
   get listOptionQuery(): ITemplate[] { return this.get().listOptionQuery; }
   updateOptionQuery(options: ITemplate[]) {
     this.patchState({
-      listOptionQuery: [...this.listOptionQuery, ...options ]
+      listOptionQuery: [...options ]
     })
   }
 }
