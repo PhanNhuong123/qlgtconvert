@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { EProperty, ITemplate } from 'src/app/app.constant';
+import { EFeatureQuery, EProperty, IProperty, ITemplate } from 'src/app/app.constant';
 import { GlobalStore } from 'src/app/store/global.store';
 
 @Component({
@@ -13,6 +13,7 @@ export class QueryPageComponent {
   constructor(private httpClient: HttpClient, private store: GlobalStore, private router: Router) { }
 
   EProperty = EProperty;
+  EFeatureQuery = EFeatureQuery
 
   vm$ = this.store.select(state => {
     return {
@@ -24,7 +25,9 @@ export class QueryPageComponent {
       isSelectQuery: state.isSelectQuery,
       searchValue: state.searchValue,
       searchResult: state.searchResult,
-      listQuerySelect: state.listQuerySelect
+      listQuerySelect: state.listQuerySelect,
+      currentTab: state.currentTab,
+      properties: state.properties
     }
   });
 
@@ -59,7 +62,7 @@ export class QueryPageComponent {
   }
   public handleSelectingQuery(): void {
     this.httpClient
-      .get('assets/emails_emailscontent.sql', { responseType: 'text' })
+      .get(`assets/${this.store.currentTab.queryFile}.sql`, { responseType: 'text' })
       .subscribe((queryText) => {
         if (queryText) {
           if (this.store.isSelectQuery) {
@@ -211,7 +214,7 @@ export class QueryPageComponent {
 
   public processing(): void {
     this.httpClient
-      .get('assets/emails_emailscontent.sql', { responseType: 'text' })
+      .get(`assets/${this.store.currentTab.queryFile}.sql`, { responseType: 'text' })
       .subscribe((res) => {
         if (res) {
           this.store.updateQueryText(res);
@@ -224,6 +227,8 @@ export class QueryPageComponent {
           this.store.clearListQuerySelect();
         }
       });
+    this.store.updateQueryInsert(true);
+    this.store.updateEditingRawFile(false);
     this.router.navigateByUrl("/query");
   }
 
@@ -238,7 +243,7 @@ export class QueryPageComponent {
         if (key.trim().length >= 0) {
           result = result.replaceAll(
             `##${property.propertyName + this.capitalizeFirstCharacter(key)}##`,
-            property[key] ?? ''
+            property[key as keyof IProperty] ?? ''
           );
         }
       });
@@ -301,15 +306,18 @@ export class QueryPageComponent {
       .join(', ');
     let updateQuery = `UPDATE ${tableName} SET ${setClauses}`;
 
-    const indexTrigger = trimmedColumns.findIndex(
-      (value) => value === '`trigger`'
-    );
-    const indexTopID = trimmedColumns.findIndex(
-      (value) => value === '`topID`'
-    );
+    let whereClauses = '';
 
-    let whereClauses = '`trigger`' + ' = ' + trimmedValues[indexTrigger];
-     whereClauses += ' && `topID`' + ' = ' + trimmedValues[indexTopID];
+    const listKey = this.store.properties.find(x => x.id === this.store.currentTab.id)?.updateWhere.split(',');
+    listKey?.forEach(key => {
+      const index = trimmedColumns.findIndex(value => value === ('`' + key + '`'));
+      if (whereClauses.length > 0) {
+        whereClauses += ' && ' + '`' + key + '`' + ' = ' + trimmedValues[index];
+      } else {
+        whereClauses += '`' + key + '`' + ' = ' + trimmedValues[index];
+      }
+    })
+
     updateQuery += ` WHERE ${whereClauses};`;
 
     return updateQuery;
@@ -340,6 +348,19 @@ export class QueryPageComponent {
       };
       this.store.updateEmailTemplates(newTemplate);
     });
+  }
+
+  public updateCurrentTab(prop: IProperty): void {
+    this.store.updateCurrentTab(prop);
+    this.processing();
+  }
+
+  public unDisable(featName: string, property?: IProperty): boolean {
+    const disableString: string = property?.disableAction ?? this.store.currentTab.disableAction;
+    if (disableString) {
+      return disableString?.split(',').findIndex(value => value.trim() === featName.trim()) === 0;
+    }
+    return true;
   }
 
 }

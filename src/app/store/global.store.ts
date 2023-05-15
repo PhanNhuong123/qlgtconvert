@@ -5,10 +5,29 @@ import { Injectable } from '@angular/core';
 const state = {
   properties: [
     {
+      id: '1',
       propertyName: 'logo',
       url: '',
       height: 'unset',
-      width: '200'
+      width: '200',
+      queryFile: 'emails_content',
+      updateWhere: 'trigger,topID',
+    },
+    {
+      id: '2',
+      propertyName: 'Replacements',
+      queryFile: 'emails_replacements',
+      updateWhere: 'emailID',
+      disableAction: 'review_Template, select_query, update_query',
+      notInput: 'true'
+    },
+    {
+      id: '3',
+      propertyName: 'palette',
+      folder: '',
+      queryFile: 'theme_palette',
+      disableAction: 'review_Template, select_query, update_query',
+      updateWhere: 'colorID'
     }
   ] as IProperty[],
 
@@ -26,7 +45,8 @@ const state = {
   isSelectQuery: false as boolean,
   searchValue: '' as string,
   searchResult: [] as ITemplate[],
-  listOptionQuery: [] as ITemplate[]
+  listOptionQuery: [] as ITemplate[],
+  currentTab: {} as IProperty
 }
 
 type State = typeof state;
@@ -52,7 +72,7 @@ export class GlobalStore extends ComponentStore<State> {
   updateEditQuery(value: boolean) { this.patchState({ editQuery: value }); }
 
   get isQueryInsert(): boolean { return this.get().isQueryInsert; }
-  updateQueryInsert(value: boolean) { this.patchState({ isQueryInsert: value });}
+  updateQueryInsert(value: boolean) { this.patchState({ isQueryInsert: value }); }
 
   get isEditingRawFile(): boolean { return this.get().isEditingRawFile; }
   updateEditingRawFile(value: boolean) { this.patchState({ isEditingRawFile: value }); }
@@ -96,7 +116,10 @@ export class GlobalStore extends ComponentStore<State> {
   get listOptionQuery(): ITemplate[] { return this.get().listOptionQuery; }
   updateOptionQuery(options: ITemplate[]) {
     this.patchState({
-      listOptionQuery: [...options ]
+      listOptionQuery: [...options]
     })
   }
+
+  get currentTab(): IProperty { return this.get().currentTab }
+  updateCurrentTab(tab: IProperty) { this.patchState({ currentTab: tab }) }
 }
