@@ -5,10 +5,29 @@ import { IProperty, ITemplate } from 'src/app/app.constant';
 const state = {
   properties: [
     {
+      id: '1',
       propertyName: 'logo',
-      url: '',
+      url: 'https://kenh14cdn.com/thumb_w/660/2019/10/23/photo982704-157183520397083705394.jpg',
       height: 'unset',
-      width: '200'
+      width: '200',
+      queryFile: 'emails_content',
+      updateWhere: 'trigger,topID',
+    },
+    {
+      id: '2',
+      propertyName: 'Replacements',
+      queryFile: 'emails_replacements',
+      updateWhere: 'emailID',
+      disableAction: 'review_Template, select_query, update_query',
+      notInput: 'true'
+    },
+    {
+      id: '3',
+      propertyName: 'palette',
+      folder: '',
+      queryFile: 'theme_palette',
+      disableAction: 'review_Template, select_query, update_query',
+      updateWhere: 'colorID'
     }
   ] as IProperty[],
 
@@ -27,7 +46,8 @@ const state = {
   searchValue: '' as string,
   searchResult: [] as ITemplate[],
   listOptionQuery: [] as ITemplate[],
-  htmlContent: '' as string
+  htmlContent: '' as string,
+  currentTab: {} as IProperty
 }
 
 type State = typeof state;
@@ -97,7 +117,7 @@ export class EmailContentStore extends ComponentStore<State> {
   get listOptionQuery(): ITemplate[] { return this.get().listOptionQuery; }
   updateOptionQuery(options: ITemplate[]) {
     this.patchState({
-      listOptionQuery: [...this.listOptionQuery, ...options ]
+      listOptionQuery: [...options ]
     })
   }
 
@@ -107,4 +127,7 @@ export class EmailContentStore extends ComponentStore<State> {
       htmlContent: value
     })
   }
+
+  get currentTab(): IProperty { return this.get().currentTab }
+  updateCurrentTab(tab: IProperty) { console.log(tab); this.patchState({ currentTab: tab }) }
 }

@@ -23,11 +23,11 @@ export class HomePageComponent {
   });
 
 
-  public sanitize(url: string): SafeUrl {
-    return this.sanitizer.bypassSecurityTrustUrl(url);
+  public sanitize(url: string | undefined): SafeUrl {
+    return this.sanitizer.bypassSecurityTrustUrl(url ?? '');
   }
 
-  public onInputChange(event: Event, property: IProperty, tap: string): void {
+  public onInputChange(event: Event, property: IProperty, tap: keyof IProperty): void {
     event.preventDefault();
     if (property[tap] !== undefined) {
       property[tap] = (event.target as HTMLInputElement)?.value ?? '';
@@ -35,8 +35,10 @@ export class HomePageComponent {
   }
 
   public processing(): void {
+    const queryFileName = this.emailContentStore.properties[0].queryFile.trim();
+
     this.httpClient
-      .get('assets/emails_emailscontent.sql', { responseType: 'text' })
+      .get(`assets/${queryFileName}.sql`, { responseType: 'text' })
       .subscribe((res) => {
         if (res) {
           this.emailContentStore.updateQueryText(res);
@@ -50,6 +52,7 @@ export class HomePageComponent {
         }
       });
     this.router.navigateByUrl("/query");
+    this.emailContentStore.updateCurrentTab(this.emailContentStore.properties.find(x => x.queryFile === queryFileName) ?? this.emailContentStore.properties[0])
   }
 
   public rePlaceKeyCode(): void {
@@ -63,7 +66,7 @@ export class HomePageComponent {
         if (key.trim().length >= 0) {
           result = result.replaceAll(
             `##${property.propertyName + this.capitalizeFirstCharacter(key)}##`,
-            property[key] ?? ''
+            property[key as keyof IProperty] ?? ''
           );
         }
       });

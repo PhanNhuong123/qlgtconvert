@@ -2,7 +2,7 @@ import { EmailContentStore } from './../email-content.store';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { EProperty, ITemplate } from 'src/app/app.constant';
+import { EFeatureQuery, EProperty, IProperty, ITemplate } from 'src/app/app.constant';
 
 
 @Component({
@@ -16,6 +16,7 @@ export class QueryPageComponent {
   public listQuerySelect = new Set<number>();
 
   EProperty = EProperty;
+  EFeatureQuery = EFeatureQuery;
 
   vm$ = this.emailContentStore.select(state => {
     return {
@@ -27,7 +28,9 @@ export class QueryPageComponent {
       isSelectQuery: state.isSelectQuery,
       searchValue: state.searchValue,
       searchResult: state.searchResult,
-      listQuerySelect: state.listQuerySelect
+      listQuerySelect: state.listQuerySelect,
+      properties: state.properties,
+      currentTab: state.currentTab
     }
   });
 
@@ -62,7 +65,7 @@ export class QueryPageComponent {
   }
   public handleSelectingQuery(): void {
     this.httpClient
-      .get('assets/emails_emailscontent.sql', { responseType: 'text' })
+      .get(`assets/${this.emailContentStore.currentTab.queryFile}.sql`, { responseType: 'text' })
       .subscribe((queryText) => {
         if (queryText) {
           if (this.emailContentStore.isSelectQuery) {
@@ -220,7 +223,7 @@ export class QueryPageComponent {
 
   public processing(): void {
     this.httpClient
-      .get('assets/emails_emailscontent.sql', { responseType: 'text' })
+      .get(`assets/${this.emailContentStore.currentTab.queryFile}.sql`, { responseType: 'text' })
       .subscribe((res) => {
         if (res) {
           this.emailContentStore.updateQueryText(res);
@@ -233,6 +236,8 @@ export class QueryPageComponent {
           this.emailContentStore.clearListQuerySelect();
         }
       });
+    this.emailContentStore.updateQueryInsert(true);
+    this.emailContentStore.updateEditingRawFile(false);
     this.router.navigateByUrl("/query");
   }
 
@@ -247,7 +252,7 @@ export class QueryPageComponent {
         if (key.trim().length >= 0) {
           result = result.replaceAll(
             `##${property.propertyName + this.capitalizeFirstCharacter(key)}##`,
-            property[key] ?? ''
+            property[key as keyof IProperty] ?? ''
           );
         }
       });
@@ -346,4 +351,16 @@ export class QueryPageComponent {
     });
   }
 
+  public updateCurrentTab(prop: IProperty): void {
+    this.emailContentStore.updateCurrentTab(prop);
+    this.processing();
+  }
+
+  public unDisable(featName: string, property?: IProperty): boolean {
+    const disableString: string = property?.disableAction ?? this.emailContentStore.currentTab.disableAction;
+    if (disableString) {
+      return disableString?.split(',').findIndex(value => value.trim() === featName.trim()) === 0;
+    }
+    return true;
+  }
 }
