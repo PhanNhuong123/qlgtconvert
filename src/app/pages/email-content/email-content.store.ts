@@ -1,13 +1,13 @@
 import { ComponentStore } from '@ngrx/component-store';
-import { IProperty, ITemplate } from "../app.constant";
 import { Injectable } from '@angular/core';
+import { IProperty, ITemplate } from 'src/app/app.constant';
 
 const state = {
   properties: [
     {
       id: '1',
       propertyName: 'logo',
-      url: '',
+      url: 'https://kenh14cdn.com/thumb_w/660/2019/10/23/photo982704-157183520397083705394.jpg',
       height: 'unset',
       width: '200',
       queryFile: 'emails_content',
@@ -46,13 +46,14 @@ const state = {
   searchValue: '' as string,
   searchResult: [] as ITemplate[],
   listOptionQuery: [] as ITemplate[],
+  htmlContent: '' as string,
   currentTab: {} as IProperty
 }
 
 type State = typeof state;
 
 @Injectable()
-export class GlobalStore extends ComponentStore<State> {
+export class EmailContentStore extends ComponentStore<State> {
   constructor() {
     super(state);
   }
@@ -120,6 +121,13 @@ export class GlobalStore extends ComponentStore<State> {
     })
   }
 
+  get htmlContent(): string { return this.get().htmlContent; }
+  updateHTMLContent(value: string) {
+    this.patchState({
+      htmlContent: value
+    })
+  }
+
   get currentTab(): IProperty { return this.get().currentTab }
-  updateCurrentTab(tab: IProperty) { this.patchState({ currentTab: tab }) }
+  updateCurrentTab(tab: IProperty) { console.log(tab); this.patchState({ currentTab: tab }) }
 }

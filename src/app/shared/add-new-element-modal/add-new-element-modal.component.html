@@ -1,0 +1,30 @@
+<div class="w-full h-full flex ">
+  <div class="w-1/5 h-full flex flex-col space-y-2 pt-2">
+    <div class="text-center px-2">
+      <button class="w-full px-4 py-2 border rounded-lg cursor-pointer hover:bg-slate-200">
+        Text
+      </button>
+    </div>
+    <div class="text-center px-2">
+      <button class="w-full px-4 py-2 border rounded-lg cursor-pointer hover:bg-slate-200">
+        Link
+      </button>
+    </div>
+    <div class="text-center px-2">
+      <button class="w-full px-4 py-2 border rounded-lg cursor-pointer hover:bg-slate-200">
+        Image
+      </button>
+    </div>
+    <div class="text-center px-2">
+      <button class="w-full px-4 py-2 border rounded-lg cursor-pointer hover:bg-slate-200">
+        Button
+      </button>
+    </div>
+  </div>
+  <div class="border-r h-full"></div>
+  <div class="w-4/5 h-full grid grid-cols-4 pt-2 px-2">
+    <div class="" *ngFor="let button of buttons">
+      <button [style]="getCssStyle(button)">{{button.content}}</button>
+    </div>
+  </div>
+</div>

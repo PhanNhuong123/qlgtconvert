@@ -6,5 +6,5 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  title = 'email-content-tool';
+  ngOnInit(): void {}
 }

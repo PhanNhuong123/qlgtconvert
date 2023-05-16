@@ -6,7 +6,7 @@ import { EProperty } from 'src/app/app.constant';
 @Component({
   selector: 'app-email-template-page',
   templateUrl: './email-template-page.component.html',
-  styleUrls: ['./email-template-page.component.scss']
+  styleUrls: ['./email-template-page.component.scss'],
 })
 export class EmailTemplatePageComponent {
   constructor(private emailContentStore: EmailContentStore, private router: Router) { }

@@ -1,0 +1,185 @@
+<ng-container *ngIf="vm$ | async as vm">
+  <div (dblclick)="onContainerClick($event)">
+    <div class="w-full flex flex-col justify-center font-normal">
+      <div class="w-full h-screen bg-[#e8e8e8] overflow-auto pb-20 flex justify-center">
+        <div #container id="item" class="bg-[#e8e8e8] w-[640px] h-fit mt-[20px]">
+          <ng-template #BODY let-item="item">
+            <ng-container [ngSwitch]="item.name">
+              <ng-container *ngSwitchCase="'table'">
+                <table [style]="getCssStyle(item)" [attr.height]="getAttribute(item, 'height')"
+                  [attr.bgcolor]="getAttribute(item, 'bgcolor')" [attr.align]="getAttribute(item, 'align')"
+                  [attr.width]="getAttribute(item, 'width')" [attr.cellpadding]="getAttribute(item, 'cellpadding')"
+                  [attr.cellspacing]="getAttribute(item, 'cellspacing')" [attr.border]="getAttribute(item, 'border')"
+                  (dblclick)="setActiveItem(item, $event)" class="cursor-pointer" [ngClass]="{
+                    'border border-dashed border-[#9747FF]':
+                      vm.activeItem.id === item.id
+                  }">
+                  <ng-container *ngIf="item.bodyItem">
+                    <ng-container *ngIf="item.bodyItem.length !== 0">
+                      <ng-container *ngFor="let i of item.bodyItem">
+                        <ng-container *ngTemplateOutlet="BODY; context: { item: i }"></ng-container>
+                      </ng-container> </ng-container></ng-container>
+                </table>
+              </ng-container>
+              <ng-container *ngSwitchCase="'tbody'">
+                <tbody [attr.height]="getAttribute(item, 'height')" [attr.bgcolor]="getAttribute(item, 'bgcolor')"
+                  [attr.align]="getAttribute(item, 'align')" [attr.width]="getAttribute(item, 'width')"
+                  [attr.cellpadding]="getAttribute(item, 'cellpadding')"
+                  [attr.cellspacing]="getAttribute(item, 'cellspacing')" [attr.border]="getAttribute(item, 'border')"
+                  (dblclick)="setActiveItem(item, $event)" class="cursor-pointer" [ngClass]="{
+                    'border border-dashed border-[#9747FF]':
+                      vm.activeItem.id === item.id
+                  }">
+                  <ng-container *ngIf="item.bodyItem">
+                    <ng-container *ngIf="item.bodyItem.length !== 0">
+                      <ng-container *ngFor="let i of item.bodyItem">
+                        <ng-container *ngTemplateOutlet="BODY; context: { item: i }"></ng-container>
+                      </ng-container> </ng-container></ng-container>
+                </tbody>
+              </ng-container>
+              <ng-container *ngSwitchCase="'tr'">
+                <tr [attr.width]="getAttribute(item, 'width')" [attr.height]="getAttribute(item, 'height')"
+                  [attr.bgcolor]="getAttribute(item, 'bgcolor')" [attr.align]="getAttribute(item, 'align')"
+                  [style]="getCssStyle(item)" (dblclick)="setActiveItem(item, $event)" class="cursor-pointer" [ngClass]="{
+                    'border border-dashed border-[#9747FF]':
+                      vm.activeItem.id === item.id
+                  }">
+                  <ng-container *ngIf="item.bodyItem">
+                    <ng-container *ngIf="item.bodyItem.length !== 0">
+                      <ng-container *ngFor="let i of item.bodyItem">
+                        <ng-container *ngTemplateOutlet="BODY; context: { item: i }"></ng-container>
+                      </ng-container> </ng-container></ng-container>
+                </tr>
+              </ng-container>
+              <ng-container *ngSwitchCase="'td'">
+                <td [attr.width]="getAttribute(item, 'width')" [attr.height]="getAttribute(item, 'height')"
+                  [attr.bgcolor]="getAttribute(item, 'bgcolor')" [attr.align]="getAttribute(item, 'align')"
+                  [attr.valign]="getAttribute(item, 'valign')" [style]="getCssStyle(item)"
+                  (dblclick)="setActiveItem(item, $event)" class="cursor-pointer relative" [ngClass]="
+                    item.name === 'td' && item.bodyItem.length === 0
+                      ? ' hover:border hover:border-dashed hover:border-[#9747FF]'
+                      : vm.activeItem.id === item.id
+                      ? 'border border-dashed border-[#9747FF]'
+                      : ''
+                  ">
+                  {{item.content}}
+                  <div *ngIf="item.name === 'td'"
+                    class="absolute hover:border left-1/2 -top-1 -mt-3 w-[26px] h-[26px] justify-center flex-none items-center hover:bg-[#9747FF] hover:flex z-20 rounded-full group">
+                    <span (click)="toggleAddNewElementModal()" class="-mt-[2px] group-hover:block hidden text-white">
+                      +</span>
+                  </div>
+                  <ng-container *ngIf="item.bodyItem">
+                    <ng-container *ngIf="item.bodyItem.length !== 0">
+                      <ng-container *ngFor="let i of item.bodyItem">
+                        <ng-container *ngTemplateOutlet="BODY; context: { item: i }"></ng-container>
+                      </ng-container> </ng-container></ng-container>
+                </td>
+              </ng-container>
+              <ng-container *ngSwitchCase="'a'">
+                <a [style]="getCssStyle(item)" (dblclick)="setActiveItem(item, $event)" class="cursor-pointer"
+                  [ngClass]="{
+                    'border border-dashed border-[#9747FF]':
+                      vm.activeItem.id === item.id
+                  }">
+                  {{ item.content }}
+                  <ng-container *ngIf="item.bodyItem">
+                    <ng-container *ngIf="item.bodyItem.length !== 0">
+                      <ng-container *ngFor="let i of item.bodyItem">
+                        <ng-container *ngTemplateOutlet="BODY; context: { item: i }"></ng-container>
+                      </ng-container> </ng-container></ng-container>
+                </a>
+              </ng-container>
+              <ng-container *ngSwitchCase="'span'">
+                <span [attr.width]="getAttribute(item, 'width')" [attr.height]="getAttribute(item, 'height')"
+                  [attr.bgcolor]="getAttribute(item, 'bgcolor')" [attr.align]="getAttribute(item, 'align')"
+                  [style]="getCssStyle(item)" (dblclick)="setActiveItem(item, $event)" class="cursor-pointer" [ngClass]="{
+                    'border border-dashed border-[#9747FF]':
+                      vm.activeItem.id === item.id
+                  }">
+                  {{ item.content }}
+                  <ng-container *ngIf="item.bodyItem">
+                    <ng-container *ngIf="item.bodyItem.length !== 0">
+                      <ng-container *ngFor="let i of item.bodyItem">
+                        <ng-container *ngTemplateOutlet="BODY; context: { item: i }"></ng-container>
+                      </ng-container> </ng-container></ng-container>
+                </span>
+              </ng-container>
+              <ng-container *ngSwitchCase="'em'">
+                <em [attr.width]="getAttribute(item, 'width')" [attr.height]="getAttribute(item, 'height')"
+                  [attr.bgcolor]="getAttribute(item, 'bgcolor')" [attr.align]="getAttribute(item, 'align')"
+                  [style]="getCssStyle(item)" (dblclick)="setActiveItem(item, $event)" class="cursor-pointer" [ngClass]="{
+                    'border border-dashed border-[#9747FF]':
+                      vm.activeItem.id === item.id
+                  }">
+                  {{ item.content }}
+                  <ng-container *ngIf="item.bodyItem">
+                    <ng-container *ngIf="item.bodyItem.length !== 0">
+                      <ng-container *ngFor="let i of item.bodyItem">
+                        <ng-container *ngTemplateOutlet="BODY; context: { item: i }"></ng-container>
+                      </ng-container> </ng-container></ng-container>
+                </em>
+              </ng-container>
+              <ng-container *ngSwitchCase="'button'">
+                <button [style]="getCssStyle(item)" (dblclick)="setActiveItem(item, $event)" class="cursor-pointer"
+                  [ngClass]="{
+                    'border border-dashed border-[#9747FF]':
+                      vm.activeItem.id === item.id
+                  }">
+                  {{ item.content }}
+                  <ng-container *ngIf="item.bodyItem">
+                    <ng-container *ngIf="item.bodyItem.length !== 0">
+                      <ng-container *ngFor="let i of item.bodyItem">
+                        <ng-container *ngTemplateOutlet="BODY; context: { item: i }"></ng-container>
+                      </ng-container> </ng-container></ng-container>
+                </button>
+              </ng-container>
+              <ng-container *ngSwitchCase="'strong'">
+                <strong [style]="getCssStyle(item)" (dblclick)="setActiveItem(item, $event)" class="cursor-pointer"
+                  [ngClass]="{
+                    'border border-dashed border-[#9747FF]':
+                      vm.activeItem.id === item.id
+                  }">
+                  {{ item.content }}
+                  <ng-container *ngIf="item.bodyItem">
+                    <ng-container *ngIf="item.bodyItem.length !== 0">
+                      <ng-container *ngFor="let i of item.bodyItem">
+                        <ng-container *ngTemplateOutlet="BODY; context: { item: i }"></ng-container>
+                      </ng-container> </ng-container></ng-container>
+                </strong>
+              </ng-container>
+              <ng-container *ngSwitchCase="'img'">
+                <img [style]="getCssStyle(item)" [attr.width]="getAttribute(item, 'width')"
+                  [attr.height]="getAttribute(item, 'height')" (dblclick)="setActiveItem(item, $event)"
+                  class="cursor-pointer" [ngClass]="{
+                    'border border-dashed border-[#9747FF]':
+                      vm.activeItem.id === item.id
+                  }" [src]="item.src" />
+
+                <ng-container *ngIf="item.bodyItem">
+                  <ng-container *ngIf="item.bodyItem.length !== 0">
+                    <ng-container *ngFor="let i of item.bodyItem">
+                      <ng-container *ngTemplateOutlet="BODY; context: { item: i }"></ng-container>
+                    </ng-container> </ng-container></ng-container>
+              </ng-container>
+
+              <ng-container *ngSwitchDefault>
+                <div (dblclick)="setActiveItem(item, $event)" class="cursor-pointer" [ngClass]="{
+                    'border border-dashed border-[#9747FF]':
+                      vm.activeItem.id === item.id
+                  }" [innerHTML]="getSafeHtml(item)" [style]="getCssStyle(item)"></div>
+                <ng-container *ngIf="item.bodyItem">
+                  <ng-container *ngIf="item.bodyItem.length !== 0">
+                    <ng-container *ngFor="let i of item.bodyItem">
+                      <ng-container *ngTemplateOutlet="BODY; context: { item: i }"></ng-container>
+                    </ng-container> </ng-container></ng-container>
+              </ng-container>
+            </ng-container>
+          </ng-template>
+          <ng-container *ngFor="let item of vm.bodyItem">
+            <ng-container *ngTemplateOutlet="BODY; context: { item: item }"></ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

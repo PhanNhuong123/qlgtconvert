@@ -1,0 +1,9 @@
+.panel {
+  @apply flex flex-col font-normal px-3 py-1 text-sm;
+  label {
+    @apply flex items-center justify-between mb-2 font-medium;
+  }
+  textarea {
+    @apply border rounded;
+  }
+}

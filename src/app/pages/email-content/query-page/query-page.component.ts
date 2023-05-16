@@ -371,5 +371,4 @@ export class QueryPageComponent {
     }
     return true;
   }
-
 }
