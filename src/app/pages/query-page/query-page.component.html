@@ -119,12 +119,12 @@
               <button
                 class="px-4 capitalize font-bold text-gray-900 hover:shadow-md bg-[#ffb618] py-1 rounded-md duration-500"
                 (click)="selectAll()">
-                {{ vm.searchResult ? "select search value" : "select all" }}
+                {{ vm.searchResult.length > 0 ? "select search value" : "select all" }}
               </button>
               <button
                 class="px-4 capitalize font-bold text-gray-900 hover:shadow-md bg-[#ffb618] py-1 rounded-md duration-500"
                 (click)="deselectAll()">
-                {{ vm.searchResult ? "deselect search value" : "deselect all" }}
+                {{ vm.searchResult.length > 0 ? "deselect search value" : "deselect all" }}
               </button>
               <button *ngIf="vm.searchResult.length === 0"
                 class="px-4 capitalize font-bold text-gray-900 hover:shadow-md bg-[#ffb618] py-1 rounded-md duration-500"
@@ -133,7 +133,7 @@
               </button>
               <button *ngIf="vm.searchResult.length === 0"
                 class="px-4 capitalize font-bold bg-gray-50 text-gray-900 hover:shadow-md hover:bg-[#ffb618] py-1 rounded-md duration-500"
-                [ngClass]="{ '!bg-[#ffb618]': vm.isSelectQuery }" (click)="handleSelectingQuery()">
+                [ngClass]="{ '!bg-[#ffb618]': vm.isSelectQuery }" (click)="cancelQuerySelect()">
                 cancel
               </button>
               <button *ngIf="vm.searchResult.length > 0"
@@ -147,7 +147,7 @@
             <div class="h-full px-4 overflow-y-scroll">
               <div *ngFor="let option of listOption" (click)="handleClickOption(option.id)"
                 class="flex my-0.5 py-1 border border-gray-100 hover:border-[#ffb618] rounded-md bg-white">
-                <input class="w-1/12 max-w-[20em]" type="checkbox" [checked]="vm.listQuerySelect.has(option.id)" />
+                <input class="w-1/12 max-w-[20em]" type="checkbox" [checked]="listQuerySelect.has(option.id)" />
                 <span [title]="option.id"
                   class="w-2/12 truncate xl:w-1/12 mr-6 text-center font-semibold text-gray-500 border-l border-r border-gray-200">Id:
                   {{ option.id }}</span>

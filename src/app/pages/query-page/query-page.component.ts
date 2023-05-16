@@ -1,8 +1,9 @@
+import { EmailContentStore } from './../email-content.store';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { EFeatureQuery, EProperty, IProperty, ITemplate } from 'src/app/app.constant';
-import { GlobalStore } from 'src/app/store/global.store';
+
 
 @Component({
   selector: 'app-query-page',
@@ -10,12 +11,14 @@ import { GlobalStore } from 'src/app/store/global.store';
   styleUrls: ['./query-page.component.scss'],
 })
 export class QueryPageComponent {
-  constructor(private httpClient: HttpClient, private store: GlobalStore, private router: Router) { }
+  constructor(private emailContentStore: EmailContentStore, private httpClient: HttpClient, private router: Router) { }
+
+  public listQuerySelect = new Set<number>();
 
   EProperty = EProperty;
-  EFeatureQuery = EFeatureQuery
+  EFeatureQuery = EFeatureQuery;
 
-  vm$ = this.store.select(state => {
+  vm$ = this.emailContentStore.select(state => {
     return {
       queryShow: state.queryShow,
       isProcess: state.isProcess,
@@ -26,67 +29,67 @@ export class QueryPageComponent {
       searchValue: state.searchValue,
       searchResult: state.searchResult,
       listQuerySelect: state.listQuerySelect,
-      currentTab: state.currentTab,
-      properties: state.properties
+      properties: state.properties,
+      currentTab: state.currentTab
     }
   });
 
   get listOption(): ITemplate[] {
-    if (this.store.searchResult.length > 0) {
-      return this.store.searchResult;
+    if (this.emailContentStore.searchResult.length > 0) {
+      return this.emailContentStore.searchResult;
     }
-    return this.store.listOptionQuery;
+    return this.emailContentStore.listOptionQuery;
   }
   public handleQueyChange(event: Event): void {
     if (event.target) {
       let value = (event.target as HTMLInputElement).value ?? '';
-      this.store.updateQueryShow(value);
+      this.emailContentStore.updateQueryShow(value);
     }
   }
   public back(): void {
-    this.store.updateIsProcess(false);
-    this.store.updateEditQuery(false);
+    this.emailContentStore.updateIsProcess(false);
+    this.emailContentStore.updateEditQuery(false);
     this.router.navigateByUrl("");
   }
   public copyQuery(): void {
-    navigator.clipboard.writeText(this.store.queryShow);
+    navigator.clipboard.writeText(this.emailContentStore.queryShow);
     alert('copied !!');
   }
   public openEditQuery(): void {
-    this.store.updateEditQuery(true);
+    this.emailContentStore.updateEditQuery(true);
   }
   public handleShowTemplate(): void {
-    this.store.updateShowTemplate(true);
+    this.emailContentStore.updateShowTemplate(true);
     this.getListTemplate();
     this.router.navigateByUrl("/email-template-page")
   }
   public handleSelectingQuery(): void {
     this.httpClient
-      .get(`assets/${this.store.currentTab.queryFile}.sql`, { responseType: 'text' })
+      .get(`assets/${this.emailContentStore.currentTab.queryFile}.sql`, { responseType: 'text' })
       .subscribe((queryText) => {
         if (queryText) {
-          if (this.store.isSelectQuery) {
-            this.store.updateListQuerySelect(this.store.listQuerySelect);
+          if (this.emailContentStore.isSelectQuery) {
+            this.emailContentStore.updateListQuerySelect(this.listQuerySelect);
             const tables: string[] = queryText
               .split('INSERT INTO')
               .map((value) => 'INSERT INTO' + value);
             tables.shift();
-            this.store.updateQueryText('');
-
-            [...this.store.listQuerySelect].forEach(x => {
+            this.emailContentStore.updateQueryText('');
+            let newValue = '';
+            [...this.listQuerySelect].forEach(x => {
               tables.forEach(value => {
                 if (value.includes(`VALUES (${x},`)) {
-                  let newValue = this.store.queryText;
                   newValue += value;
-                  this.store.updateQueryText(newValue);
                 }
               })
             })
+            this.emailContentStore.updateQueryText(newValue);
             this.changeQueryShow('insert');
-            this.store.updateSelectQuery(false);
-            this.store.updateEditingRawFile(false);
+            this.emailContentStore.updateSelectQuery(false);
+            this.emailContentStore.updateEditingRawFile(false);
           } else {
-            this.store.updateSelectQuery(true);
+            this.listQuerySelect = new Set(this.emailContentStore.listQuerySelect);
+            this.emailContentStore.updateSelectQuery(true);
             const tables: string[] = queryText
               .split('INSERT INTO')
               .map((value) => 'INSERT INTO' + value);
@@ -114,127 +117,133 @@ export class QueryPageComponent {
               };
               listSelect.push(newTemplate);
             });
-            this.store.updateOptionQuery(listSelect);
-            if (this.store.listQuerySelect.size === 0) {
+            this.emailContentStore.updateOptionQuery(listSelect);
+            if (this.listQuerySelect.size === 0) {
               this.selectAll();
             }
           }
         }
       });
   }
+
+  public cancelQuerySelect() {
+    this.emailContentStore.updateSelectQuery(false);
+  }
+
   public changeQueryShow(type: 'insert' | 'update'): void {
-    if (this.store.isEditingRawFile) {
-      this.store.updateEditingRawFile(false);
-      this.store.updateQueryText(this.store.queryShow);
+    if (this.emailContentStore.isEditingRawFile) {
+      this.emailContentStore.updateEditingRawFile(false);
+      this.emailContentStore.updateQueryText(this.emailContentStore.queryShow);
     }
 
     if (type === 'insert') {
-      this.store.updateQueryInsert(true);
+      this.emailContentStore.updateQueryInsert(true);
       this.rePlaceKeyCode();
     } else if (type === 'update') {
-      this.store.updateQueryInsert(false);
+      this.emailContentStore.updateQueryInsert(false);
       this.rePlaceKeyCode();
       this.convertAllInsertToUpdate();
     }
-    if (this.store.queryShow.trim().length === 0) {
-      this.store.updateQueryShow(this.store.errorText);
+    if (this.emailContentStore.queryShow.trim().length === 0) {
+      this.emailContentStore.updateQueryShow(this.emailContentStore.errorText);
     }
   }
   public closeEditQuery(): void {
     // this is save button
-    this.store.updateEditQuery(false);
-    if (this.store.isEditingRawFile) {
-      this.store.updateEditingRawFile(false);
-      this.store.updateQueryText(this.store.queryShow);
+    this.emailContentStore.updateEditQuery(false);
+    if (this.emailContentStore.isEditingRawFile) {
+      this.emailContentStore.updateEditingRawFile(false);
+      this.emailContentStore.updateQueryText(this.emailContentStore.queryShow);
     }
   }
 
-  public handleSearchChange(event: Event) {
+  public handleSearchChange(event: Event): void {
     let value = ''
     if (event.target) {
       value = (event.target as HTMLInputElement)?.value ?? '';
-      this.store.updateSearchValue(value);
+      this.emailContentStore.updateSearchValue(value);
     }
     if (value.length > 0) {
-      let data = this.store.listOptionQuery.filter(x => x.email.toLocaleLowerCase().includes(value.toLocaleLowerCase()));
-      this.store.updateSearchResult(data);
+      let data = this.emailContentStore.listOptionQuery.filter(x => x.email.toLocaleLowerCase().includes(value.toLocaleLowerCase()));
+      this.emailContentStore.updateSearchResult(data);
     } else {
-      this.store.updateSearchResult([]);
+      this.emailContentStore.updateSearchResult([]);
     }
   }
 
-  public selectAll() {
-    if (this.store.searchResult.length > 0) {
+  public selectAll(): void {
+    if (this.emailContentStore.searchResult.length > 0) {
       this.handleSelectSearchValue('select')
     } else {
-      this.store.clearListQuerySelect();
-      this.store.listOptionQuery.forEach(x => this.store.listQuerySelect.add(x.id))
+      this.emailContentStore.clearListQuerySelect();
+      this.emailContentStore.listOptionQuery.forEach(x => this.listQuerySelect.add(x.id))
     }
   }
 
-  public deselectAll() {
-    if (this.store.searchResult.length > 0) {
+  public deselectAll(): void {
+    if (this.emailContentStore.searchResult.length > 0) {
       this.handleSelectSearchValue('deselect')
     } else {
-      this.store.clearListQuerySelect();
+      this.listQuerySelect.clear();
     }
   }
 
   public handleSelectSearchValue(action: 'select' | 'deselect'): void {
-    if (this.store.searchResult.length > 0) {
+    if (this.emailContentStore.searchResult.length > 0) {
       if (action === 'select') {
-        this.store.searchResult.forEach(x => {
-          if (!this.store.listQuerySelect.has(x.id)) {
-            this.store.listQuerySelect.add(x.id);
+        this.emailContentStore.searchResult.forEach(x => {
+          if (!this.listQuerySelect.has(x.id)) {
+            this.listQuerySelect.add(x.id);
           }
         })
       } else {
-        this.store.searchResult.forEach(x => {
-          this.store.listQuerySelect.delete(x.id)
+        this.emailContentStore.searchResult.forEach(x => {
+          this.listQuerySelect.delete(x.id);
         })
       }
     }
   }
   public clearSearchValue(): void {
-    this.store.updateSearchValue('');
-    this.store.updateSearchResult([]);
+    this.emailContentStore.updateSearchValue('');
+    this.emailContentStore.updateSearchResult([]);
   }
+
   public handleClickOption(id: number): void {
-    if (this.store.listQuerySelect.has(id)) {
-      this.store.listQuerySelect.delete(id)
+    if (this.listQuerySelect.has(id)) {
+      this.listQuerySelect.delete(id);
     } else {
-      this.store.listQuerySelect.add(id)
+      this.listQuerySelect.add(id);
     }
   }
 
   public editRawFile(): void {
-    this.store.updateEditingRawFile(true);
-    this.store.updateQueryShow(this.store.queryText);
+    this.emailContentStore.updateEditingRawFile(true);
+    this.emailContentStore.updateQueryShow(this.emailContentStore.queryText);
   }
 
   public processing(): void {
     this.httpClient
-      .get(`assets/${this.store.currentTab.queryFile}.sql`, { responseType: 'text' })
+      .get(`assets/${this.emailContentStore.currentTab.queryFile}.sql`, { responseType: 'text' })
       .subscribe((res) => {
         if (res) {
-          this.store.updateQueryText(res);
+          this.emailContentStore.updateQueryText(res);
           this.rePlaceKeyCode();
-          if (!this.store.isQueryInsert) {
+          if (!this.emailContentStore.isQueryInsert) {
             this.convertAllInsertToUpdate();
           }
           this.getListTemplate();
-          this.store.updateIsProcess(true);
-          this.store.clearListQuerySelect();
+          this.emailContentStore.updateIsProcess(true);
+          this.emailContentStore.clearListQuerySelect();
         }
       });
-    this.store.updateQueryInsert(true);
-    this.store.updateEditingRawFile(false);
+    this.emailContentStore.updateQueryInsert(true);
+    this.emailContentStore.updateEditingRawFile(false);
     this.router.navigateByUrl("/query");
   }
 
   public rePlaceKeyCode(): void {
-    let result = this.store.queryText;
-    this.store.properties.forEach((property) => {
+    let result = this.emailContentStore.queryText;
+    this.emailContentStore.properties.forEach((property) => {
 
       const keys = Object.keys(property).filter(
         (key) => key !== 'propertyName'
@@ -249,24 +258,24 @@ export class QueryPageComponent {
       });
     });
 
-    this.store.updateQueryShow(result);
+    this.emailContentStore.updateQueryShow(result);
   }
 
-  public capitalizeFirstCharacter(word: string) {
+  public capitalizeFirstCharacter(word: string): string {
     const capitalized = word.charAt(0).toUpperCase() + word.slice(1)
     return capitalized;
   }
 
   public convertAllInsertToUpdate(): void {
-    const tables: string[] = this.store.queryShow
+    const tables: string[] = this.emailContentStore.queryShow
       .split('INSERT INTO')
       .map((value) => 'INSERT INTO' + value);
     tables.shift();
-    this.store.updateQueryShow('');
+    this.emailContentStore.updateQueryShow('');
     tables.forEach((value) => {
-      let newValue = this.store.queryShow;
+      let newValue = this.emailContentStore.queryShow;
       newValue += this.convertInsertToUpdate(value);
-      this.store.updateQueryShow(newValue);
+      this.emailContentStore.updateQueryShow(newValue);
     });
   }
 
@@ -324,10 +333,10 @@ export class QueryPageComponent {
   }
 
   public getListTemplate(): void {
-    this.store.emailTemplates.length = 0;
+    this.emailContentStore.emailTemplates.length = 0;
     this.rePlaceKeyCode();
 
-    const tables: string[] = this.store.queryShow
+    const tables: string[] = this.emailContentStore.queryShow
       .split('INSERT INTO')
       .map((value) => 'INSERT INTO' + value);
     tables.shift();
@@ -346,17 +355,17 @@ export class QueryPageComponent {
         email: email,
         htmlContent: htmlContent.replaceAll(/\\r\\n|\\/gi, ''),
       };
-      this.store.updateEmailTemplates(newTemplate);
+      this.emailContentStore.updateEmailTemplates(newTemplate);
     });
   }
 
   public updateCurrentTab(prop: IProperty): void {
-    this.store.updateCurrentTab(prop);
+    this.emailContentStore.updateCurrentTab(prop);
     this.processing();
   }
 
   public unDisable(featName: string, property?: IProperty): boolean {
-    const disableString: string = property?.disableAction ?? this.store.currentTab.disableAction;
+    const disableString: string = property?.disableAction ?? this.emailContentStore.currentTab.disableAction;
     if (disableString) {
       return disableString?.split(',').findIndex(value => value.trim() === featName.trim()) === 0;
     }
