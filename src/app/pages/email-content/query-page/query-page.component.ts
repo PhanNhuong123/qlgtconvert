@@ -317,7 +317,7 @@ export class QueryPageComponent {
 
     let whereClauses = '';
 
-    const listKey = this.store.properties.find(x => x.id === this.store.currentTab.id)?.updateWhere.split(',');
+    const listKey = this.emailContentStore.properties.find(x => x.id === this.emailContentStore.currentTab.id)?.updateWhere.split(',');
     listKey?.forEach(key => {
       const index = trimmedColumns.findIndex(value => value === ('`' + key + '`'));
       if (whereClauses.length > 0) {
