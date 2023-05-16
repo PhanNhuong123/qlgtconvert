@@ -2,6 +2,7 @@ import { Component, Renderer2, ViewEncapsulation, OnInit } from '@angular/core';
 import { EmailTemplateBuilderStore } from './email-template.store';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { EmailContentStore } from '../email-content/email-content.store';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-email-template-builder',
@@ -26,7 +27,8 @@ export class EmailTemplateBuilderComponent implements OnInit {
     private emailTemplateBuilderStore: EmailTemplateBuilderStore,
     private sanitizer: DomSanitizer,
     private renderer: Renderer2,
-    private emailContentStore: EmailContentStore
+    private emailContentStore: EmailContentStore,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -105,5 +107,9 @@ export class EmailTemplateBuilderComponent implements OnInit {
         this.renderer
       ),
     });
+  }
+
+  backToEmailTemplate() {
+    this.router.navigateByUrl('/');
   }
 }
