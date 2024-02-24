@@ -1,79 +1,79 @@
-<ng-container *ngIf="vm$ | ngrxPush as vm">
-  <div class="h-screen w-screen flex justify-center items-center">
-    <div
-      class="home-panel w-10/12 lg:w-6/12 min-h-[4em] p-8 rounded shadow ring-1 ring-gray-200 hover:shadow-lg transition-all">
-      <ng-container *ngFor="let property of vm.properties">
-        <ng-container *ngIf="!(property.notInput?.length ? true : false)">
-          <h3 class="font-bold pt-4 mb-2 capitalize">{{ property.propertyName }}</h3>
-          <div class="flex justify-around gap-2">
-            <ng-container *ngIf="property[EProperty.URL] !== undefined">
-              <div
-                class="absolute w-2/5 overflow-hidden mx-auto flex justify-center h-12 hover:scale-150 z-50 translate-y-full transition-all top-0">
-                <img [src]="sanitize(property[EProperty.URL])" [height]="property[EProperty.HEIGHT]"
-                  [width]="property[EProperty.WIDTH]" />
-              </div>
-              <div class="relative flex-1">
-                <input type="text" id="{{ property.propertyName }}_URL"
-                  class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder=" " [value]="property[EProperty.URL]"
-                  (change)="onInputChange($event, property, EProperty.URL)" />
-                <label for="{{ property.propertyName }}_URL"
-                  class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">{{
-                  property.propertyName }} URL</label>
-              </div>
-            </ng-container>
-            <ng-container *ngIf="property[EProperty.WIDTH] !== undefined">
-              <div class="relative">
-                <input type="text" id="{{ property.propertyName }}_width"
-                  class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder=" " [value]="property[EProperty.WIDTH]"
-                  (change)="onInputChange($event, property, EProperty.WIDTH)" />
-                <label for="{{ property.propertyName }}_width"
-                  class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">{{
-                  property.propertyName }} width</label>
-              </div>
-            </ng-container>
-            <ng-container *ngIf="property[EProperty.HEIGHT] !== undefined">
-              <div class="relative">
-                <input type="text" id="{{ property.propertyName }}_height"
-                  class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder=" " [value]="property[EProperty.HEIGHT]"
-                  (change)="onInputChange($event, property, EProperty.HEIGHT)" />
-                <label for="{{ property.propertyName }}_height"
-                  class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">{{
-                  property.propertyName }} height</label>
-              </div>
-            </ng-container>
-            <ng-container *ngIf="property[EProperty.FOLDER] !== undefined">
-              <div class="relative w-full">
-                <input type="text" id="{{ property.propertyName }}_folder"
-                  class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder=" " [value]="property[EProperty.FOLDER]"
-                  (change)="onInputChange($event, property, EProperty.FOLDER)" />
-                <label for="{{ property.propertyName }}_folder"
-                  class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">{{
-                  property.propertyName }} folder</label>
-              </div>
-            </ng-container>
-          </div>
-        </ng-container>
-      </ng-container>
-      <div class="mt-12 flex justify-center">
-        <button (click)="processing()"
-          class="relative w-full px-5 py-3 overflow-hidden font-medium text-gray-600 bg-blue-100 border border-gray-100 rounded-lg shadow-inner group">
-          <span
-            class="absolute top-0 left-0 w-0 h-0 transition-all duration-200 border-t-2 border-blue-600 group-hover:w-full ease"></span>
-          <span
-            class="absolute bottom-0 right-0 w-0 h-0 transition-all duration-200 border-b-2 border-blue-600 group-hover:w-full ease"></span>
-          <span
-            class="absolute top-0 left-0 w-full h-0 transition-all duration-300 delay-200 bg-blue-500 group-hover:h-full ease"></span>
-          <span
-            class="absolute bottom-0 left-0 w-full h-0 transition-all duration-300 delay-200 bg-blue-500 group-hover:h-full ease"></span>
-          <span
-            class="absolute insert-0 top-0 left-0 w-full h-full duration-300 delay-300 bg-blue-500 opacity-0 group-hover:opacity-100"></span>
-          <span class="relative transition-colors duration-300 delay-200 group-hover:text-white ease">Process !</span>
-        </button>
+<div class="h-screen w-screen flex justify-center items-center">
+  <div
+    class="home-panel w-10/12 lg:w-6/12 min-h-[4em] p-8 rounded shadow ring-1 ring-gray-200 hover:shadow-lg transition-all">
+    <div class="flex justify-around gap-2">
+      <div class="relative w-full">
+        <input type="text" id="Label"
+          class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+          placeholder=" " [value]="Model[EProperty.LABEL]" (change)="onInputChange($event, Model, EProperty.LABEL)" />
+        <label for="Label"
+          class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">
+          Label
+        </label>
       </div>
     </div>
+    <div class="flex justify-around gap-2">
+      <div class="relative w-full">
+        <input type="text" id="Label"
+          class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+          placeholder=" " [value]="Model[EProperty.LINK]" (change)="onInputChange($event, Model, EProperty.LINK)" />
+        <label for="Label"
+          class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">
+          Link
+        </label>
+      </div>
+    </div>
+    <div class="flex justify-around gap-2 mt-2">
+      <div class="relative w-full">
+        <input type="text" id="Label"
+          class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+          placeholder=" " [value]="Model[EProperty.NAMESPACE]"
+          (change)="onInputChange($event, Model, EProperty.NAMESPACE)" />
+        <label for="Label"
+          class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">
+          Name space
+        </label>
+      </div>
+    </div>
+    <div class="flex justify-around gap-2 mt-2">
+      <div class="relative w-full">
+        <input type="text" id="Label"
+          class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+          placeholder=" " [value]="Model[EProperty.TABLE_NAME]"
+          (change)="onInputChange($event, Model, EProperty.TABLE_NAME)" />
+        <label for="Label"
+          class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">
+          Table name
+        </label>
+      </div>
+    </div>
+    <div class="flex justify-around gap-2 mt-2">
+      <div class="relative w-full">
+        <input type="text" id="Label"
+          class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+          placeholder=" " [value]="Model[EProperty.MODEL]"
+          (change)="onInputChange($event, Model, EProperty.MODEL)" />
+        <label for="Label"
+          class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">
+          Model
+        </label>
+      </div>
+    </div>
+    <div class="mt-12 flex justify-center">
+      <button (click)="processing()"
+        class="relative w-full px-5 py-3 overflow-hidden font-medium text-gray-600 bg-blue-100 border border-gray-100 rounded-lg shadow-inner group">
+        <span
+          class="absolute top-0 left-0 w-0 h-0 transition-all duration-200 border-t-2 border-blue-600 group-hover:w-full ease"></span>
+        <span
+          class="absolute bottom-0 right-0 w-0 h-0 transition-all duration-200 border-b-2 border-blue-600 group-hover:w-full ease"></span>
+        <span
+          class="absolute top-0 left-0 w-full h-0 transition-all duration-300 delay-200 bg-blue-500 group-hover:h-full ease"></span>
+        <span
+          class="absolute bottom-0 left-0 w-full h-0 transition-all duration-300 delay-200 bg-blue-500 group-hover:h-full ease"></span>
+        <span
+          class="absolute insert-0 top-0 left-0 w-full h-full duration-300 delay-300 bg-blue-500 opacity-0 group-hover:opacity-100"></span>
+        <span class="relative transition-colors duration-300 delay-200 group-hover:text-white ease">Process !</span>
+      </button>
+    </div>
   </div>
-</ng-container>
+</div>

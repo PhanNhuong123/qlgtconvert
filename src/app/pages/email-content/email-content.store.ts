@@ -1,37 +1,62 @@
 import { ComponentStore } from '@ngrx/component-store';
 import { Injectable } from '@angular/core';
-import { IProperty, ITemplate } from 'src/app/app.constant';
+import { ETab, IProperty, IPropertyModel, ITabProperty, ITemplate } from 'src/app/app.constant';
 
 const state = {
   properties: [
     {
-      id: '1',
-      propertyName: 'logo',
-      url: 'https://kenh14cdn.com/thumb_w/660/2019/10/23/photo982704-157183520397083705394.jpg',
-      height: 'unset',
-      width: '200',
-      queryFile: 'emails_content',
-      updateWhere: 'trigger,topID',
+      id: "1",
+      fileName: "Entity",
+      type: ETab.ENTITY
     },
     {
-      id: '2',
-      propertyName: 'Replacements',
-      queryFile: 'emails_replacements',
-      updateWhere: 'emailID',
-      disableAction: 'review_Template, select_query, update_query',
-      notInput: 'true'
+      id: "2",
+      fileName: "Dto",
+      type: ETab.DTO
     },
     {
-      id: '3',
-      propertyName: 'palette',
-      folder: '',
-      queryFile: 'theme_palette',
-      disableAction: 'review_Template, select_query, update_query',
-      updateWhere: 'colorID'
-    }
-  ] as IProperty[],
+      id: "3",
+      fileName: "iAppService",
+      type: ETab.I_APP_SERVICE
+    },
+    {
+      id: "4",
+      fileName: "appService",
+      type: ETab.APP_SERVICE
+    },
+    {
+      id: "5",
+      fileName: "danhSachCs",
+      type: ETab.DANH_SACH_CS
+    },
+    {
+      id: "6",
+      fileName: "danhSachRazor",
+      type: ETab.DANH_SACH_RAZOR
+    },
+    {
+      id: "7",
+      fileName: "formDialogCs",
+      type: ETab.FORM_DIALOG_CS
+    },
+    {
+      id: "8",
+      fileName: "formDialogRazor",
+      type: ETab.FORM_DIALOG_RAZOR
+    },
+    {
+      id: "9",
+      fileName: "searchCs",
+      type: ETab.SEARCH_CS
+    },
+    {
+      id: "6",
+      fileName: "searchRazor",
+      type: ETab.SEARCH_RAZOR
+    },
+  ] as ITabProperty[],
 
-  queryText: '' as string,
+  model: [] as Array<IPropertyModel>,
   queryShow: '' as string,
   isProcess: false as boolean,
   editQuery: false as boolean,
@@ -47,7 +72,8 @@ const state = {
   searchResult: [] as ITemplate[],
   listOptionQuery: [] as ITemplate[],
   htmlContent: '' as string,
-  currentTab: {} as IProperty
+  currentTab: {} as ITabProperty,
+  moduleInfo: {} as IProperty
 }
 
 type State = typeof state;
@@ -58,10 +84,13 @@ export class EmailContentStore extends ComponentStore<State> {
     super(state);
   }
 
-  get properties(): IProperty[] { return this.get().properties; }
+  get properties(): ITabProperty[] { return this.get().properties; }
 
-  get queryText(): string { return this.get().queryText; }
-  public updateQueryText(newText: string) { this.patchState({ queryText: newText }); }
+  get model(): Array<IPropertyModel> { return this.get().model; }
+  public updateModel(newModel: Array<IPropertyModel>) { this.patchState({ model: newModel }); }
+
+  get moduleInfo(): IProperty { return this.get().moduleInfo; }
+  public updateModuleInfo(newModel: IProperty) { this.patchState({ moduleInfo: newModel }); }
 
   get queryShow(): string { return this.get().queryShow; }
   public updateQueryShow(newText: string) { this.patchState({ queryShow: newText }); }
@@ -128,6 +157,6 @@ export class EmailContentStore extends ComponentStore<State> {
     })
   }
 
-  get currentTab(): IProperty { return this.get().currentTab }
-  updateCurrentTab(tab: IProperty) { console.log(tab); this.patchState({ currentTab: tab }) }
+  get currentTab(): ITabProperty { return this.get().currentTab }
+  updateCurrentTab(tab: ITabProperty) { console.log(tab); this.patchState({ currentTab: tab }) }
 }
