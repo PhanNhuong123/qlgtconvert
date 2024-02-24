@@ -54,7 +54,6 @@ export class QueryPageComponent implements OnInit {
   }
   public copyQuery(): void {
     navigator.clipboard.writeText(this.content);
-    alert('copied !!');
   }
 
   public updateCurrentTab(prop: ITabProperty): void {
