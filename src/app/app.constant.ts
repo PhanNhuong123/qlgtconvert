@@ -14,7 +14,7 @@ export interface ITabProperty {
 
 export interface IPropertyModel {
   isRequired: boolean;
-  maxLength: number;
+  maxLength?: number;
   propertyName: string;
   label: string;
   type: string;
