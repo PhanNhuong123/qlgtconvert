@@ -50,7 +50,7 @@ const state = {
       type: ETab.SEARCH_CS
     },
     {
-      id: "6",
+      id: "10",
       fileName: "searchRazor",
       type: ETab.SEARCH_RAZOR
     },
