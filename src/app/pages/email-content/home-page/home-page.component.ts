@@ -1,7 +1,5 @@
 import { EmailContentStore } from './../email-content.store';
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { EProperty, IProperty, IPropertyModel, ITemplate } from 'src/app/app.constant';
 
@@ -20,25 +18,49 @@ export class HomePageComponent {
   modelx: Array<IPropertyModel> = [
     {
       isRequired: true,
-      label: "Tên Hồ Sơ",
+      label: "Tên bến xe",
       maxLength: 150,
       type: "string",
       propertyName: "Name"
     },
     {
       isRequired: true,
-      label: "Mã Số Hồ Sơ",
+      label: "Mã bến xe",
       maxLength: 150,
       type: "string",
       propertyName: "Code"
-    }
+    },
+    {
+      isRequired: false,
+      label: " Vị trí",
+      type: "string",
+      propertyName: "Location"
+    },
+    {
+      isRequired: false,
+      label: "Diện tích",
+      type: "decimal",
+      propertyName: "AreaAmount"
+    },
+    {
+      isRequired: false,
+      label: "Năm thành lập",
+      type: "string",
+      propertyName: "YearOfEstablishment"
+    },
+    {
+      isRequired: false,
+      label: "Tuyến xe",
+      type: "string",
+      propertyName: "BusRoute"
+    },
   ]
 
   Model: IProperty = {
     label: "Quản Lý Hồ Sơ Phương Tiện Giao Thông Đường Bộ",
-    nameSpace: "QuanLyCSDLHoSoVanTaiPhuongTienNguoiLai.QuanLyHoSoGiayPhepVePhuongTienVaNguoiLai.QuanLyHoSoPhuongTienGiaoThongDuongBo",
-    tableName: "RoadTrafficVehicleDocumentation",
-    link: "/admin/quan-ly-csdl-ho-so-van-tai-phuong-tien-nguoi-lai/ho-so-giay-phep/phuong-tien-giao-thong-duong-bo",
+    nameSpace: "QuanLyCSDLBaoCaoTongHopVaThongKe.BaoCaoBenXe",
+    tableName: "BusStationReport",
+    link: "/admin/quan-ly-csdl-baocao-tonghop-thongke/baocao-benxe",
     model: JSON.stringify(this.modelx)
   };
 

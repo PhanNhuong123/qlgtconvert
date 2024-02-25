@@ -113,10 +113,19 @@ export class QueryPageComponent implements OnInit {
     let model = this.emailContentStore.model;
 
     model.forEach((m) => {
+
+      var isTime = false
+      var array = ['Date', 'Time', 'Year', 'Day', 'Month']
+      array.forEach(x => {
+        if (m.propertyName.includes(x))
+          isTime = true;
+      })
+
       result += `<MudItem md="6">
       <MudTextField Label="${m.label}"
                     Variant="Variant.Outlined"
                     Margin="Margin.Dense"
+                    ${isTime ? 'InputType="InputType.Date"' : ""}
                     @bind-Value="SearchModel.${m.propertyName}" />
   </MudItem>\r\n`
     })
@@ -232,11 +241,6 @@ export class QueryPageComponent implements OnInit {
   }
 
   public createFormDialogRazorContent(): string {
-    let name = this.emailContentStore.moduleInfo.tableName;
-    let nameSpace = this.emailContentStore.moduleInfo.nameSpace;
-    let nameSpaceArr = nameSpace.split('.');
-    nameSpaceArr.shift();
-    let ModuleContentType = nameSpaceArr.join('.');
 
     let result: string = `<style>
     .mud-dialog {
@@ -357,24 +361,6 @@ export class QueryPageComponent implements OnInit {
         </MudTabs>
     </DialogContent>
     <DialogActions>
-        @if (!ShowDetail)
-        {
-            <MudButton Size="Size.Small"
-                       Class="action-button"
-                       Color="Color.Primary"
-                       Variant="Variant.Filled"
-                       StartIcon="@Icons.Material.Filled.Check"
-                       OnClick="() => SubmitAsync()">Lưu</MudButton>
-            @if (Model.Id == 0)
-            {
-                <MudButton Size="Size.Small"
-                           Class="action-button"
-                           Color="Color.Primary"
-                           Variant="Variant.Filled"
-                           StartIcon="@Icons.Material.Filled.Check"
-                           OnClick="SubmitAndStayAsync">Lưu và Khởi tạo lại</MudButton>
-            }
-        }
         <MudButton Size="Size.Small"
                    Variant="Variant.Outlined"
                    StartIcon="@Icons.Material.Filled.Close"
@@ -382,7 +368,6 @@ export class QueryPageComponent implements OnInit {
                    OnClick="Cancel">Đóng</MudButton>
     </DialogActions>
 </MudDialog>
-
   `;
     return result;
   }
@@ -390,9 +375,6 @@ export class QueryPageComponent implements OnInit {
   public createFormDialogCsContent(): string {
     let name = this.emailContentStore.moduleInfo.tableName;
     let nameSpace = this.emailContentStore.moduleInfo.nameSpace;
-    let nameSpaceArr = nameSpace.split('.');
-    nameSpaceArr.shift();
-    let ModuleContentType = nameSpaceArr.join('.');
 
     let result: string = `using Microsoft.AspNetCore.Components;
     using Microsoft.AspNetCore.Components.Forms;
@@ -419,10 +401,10 @@ export class QueryPageComponent implements OnInit {
 
     public partial class FormDialog
     {
-        private const string ModuleContentType = SmsConstants.FileContentModuleType.${ModuleContentType};
+        private const string ModuleContentType = SmsConstants.FileContentModuleType.hhhh.hhhh;
 
         [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
-        [Inject] I${name}AppService AppService { get; set; } = null!;
+        [Inject] I${name.replace('Report' , '')}AppService AppService { get; set; } = null!;
         [Inject] IDialogService DialogService { get; set; } = null!;
         [Inject] IFileContentDataAppService FileService { get; set; } = null!;
         [Inject] IJSRuntime JSRuntime { get; set; } = null!;
@@ -592,78 +574,6 @@ export class QueryPageComponent implements OnInit {
                 });
             }
         }
-
-        async Task SubmitAsync(bool stayEdit = false)
-        {
-            await form.Validate();
-            try
-            {
-                UIGlobalService.ShowLoading();
-                if (form.IsValid)
-                {
-                    Tbl${name}Dto? resultModel;
-                    if (Model.Id > 0)
-                    {
-                        resultModel = await AppService.UpdateAsync(Model.Id, Model);
-                    }
-                    else
-                    {
-                        resultModel = await AppService.CreateAsync(Model);
-                    }
-
-                    if (resultModel != null)
-                    {
-                        await SaveFiles(resultModel);
-
-                        Snackbar.Add(
-                            "Lưu thành công",
-                            Severity.Success,
-                            config =>
-                            {
-                                config.ShowCloseIcon = false;
-                            });
-
-                        await FormEventCallback.InvokeAsync(Model);
-
-                        if (stayEdit)
-                            await form.ResetAsync();
-                        else
-                            MudDialog.Close(DialogResult.Ok(true));
-                    }
-                    else
-                    {
-                        throw new Exception("Lỗi - Lưu thất bại");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                var message = ex.Message;
-                if (ex.Message.Contains("Username"))
-                {
-                    message = "Tên đăng nhập đã tồn tại";
-                }
-                else if (ex.Message.Contains("Email"))
-                {
-                    message = "Thư điện tử đã tồn tại";
-                }
-
-                Snackbar.Add(
-                       "Lỗi: " + message,
-                       Severity.Error,
-                       config =>
-                       {
-                           config.ShowCloseIcon = false;
-                       });
-            }
-            UIGlobalService.HideLoading();
-        }
-
-        async Task SubmitAndStayAsync()
-        {
-            await SubmitAsync(true);
-        }
-
         void Cancel()
         {
             MudDialog.Cancel();
@@ -717,146 +627,128 @@ export class QueryPageComponent implements OnInit {
     @using SMS.DuLieuGTVTService.Models
     @using SMS.MasterService.Models
 
-    <style>
-        .action-icon {
-            font-size: 24px;
-        }
-    </style>
+<style>
+    .action-icon {
+        font-size: 24px;
+    }
+</style>
 
-    <Search BasicSearchOnClick="BasicSearchOnClick"
-            AdvanceSearchOnClick="AdvanceSearchOnClick" />
+<Search BasicSearchOnClick="BasicSearchOnClick"
+        AdvanceSearchOnClick="AdvanceSearchOnClick" />
 
-    <MudCard Class="mt-6">
-        <div Style="margin-bottom: 38px;">
-            <div class="d-flex justify-space-between align-items-center" style="padding: 15px 24px;">
-                <span class="fw-bold" style="font-size: 16px!important;">Kết quả <MudChip Class="chip-result-count">@(TotalCount)</MudChip></span>
-                <div>
-                    <MudButton Size="Size.Small"
-                               Variant="Variant.Filled"
-                               StartIcon="@Icons.Material.Filled.Add"
-                               Style="height: 36px;font-size: 14px;"
-                               Color="Color.Primary"
-                               OnClick="CreateOnClick">
-                        Thêm mới
-                    </MudButton>
-                    @if (SelectedItems.Count > 0)
-                    {
-                        <MudButton Size="Size.Small"
-                                   Variant="Variant.Outlined"
-                                   IconClass="action-icon"
-                                   StartIcon="@DeleteIcon"
-                                   Style="margin-left: 8px; border-color: #D0D5DD;width: 88px; height: 36px;font-size: 14px;"
-                                   OnClick="BulkDeleteOnClick">
-                            Xóa
-                        </MudButton>
-                    }
-                </div>
+<MudCard Class="mt-6">
+    <div Style="margin-bottom: 38px;">
+        <div class="d-flex justify-space-between align-items-center" style="padding: 15px 24px;">
+            <span class="fw-bold" style="font-size: 16px!important;">Kết quả <MudChip Class="chip-result-count">@(TotalCount)</MudChip></span>
+            <div>
+                <MudButton Size="Size.Small"
+                           Class="mr-3"
+                           Variant="Variant.Filled"
+                           StartIcon="@Icons.Material.Filled.Download"
+                           Color="Color.Primary"
+                           OnClick="ExportOnClick">
+                    Xuất báo cáo
+                </MudButton>
+                <MudButton Size="Size.Small"
+                           Variant="Variant.Filled"
+                           StartIcon="@Icons.Material.Filled.Print"
+                           Color="Color.Success"
+                           OnClick="PrintOnClick">
+                    In
+                </MudButton>
             </div>
-            <MudTable @ref="table"
-                      ServerData="@(new Func<TableState, Task<TableData<Tbl${name}Dto>>>(ServerLoadData))"
-                      Hover="true"
-                      Elevation="0"
-                      Dense="true"
-                      Bordered="true"
-                      Breakpoint="Breakpoint.Sm"
-                      Height="calc(100vh - 450px)"
-                      FixedHeader="true"
-                      MultiSelection="true"
-                      Style="width: 100%"
-                      @bind-SelectedItems="SelectedItems">
-                <HeaderContent>
-                    <MudTh>ID</MudTh>
-                    ${this.convertDanhSachRazorHeaderContent()}
-                    <MudTh Style="width: 130px;text-align: center;">Hành động</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Id">@context.Id</MudTd>
-                    ${this.convertDanhSachRazorRowTemplate()}
-                    <MudTd DataLabel="Tương tác" Style="text-align: center;">
-                        <MudIconButton Title="Chi tiết"
-                                       Icon="@Icons.Material.Filled.RemoveRedEye"
-                                       Color="Color.Info"
-                                       Size="Size.Small"
-                                       OnClick="() => DetailOnClick(context)" />
-                        <MudIconButton Title="Chỉnh sửa"
-                                       Icon="@Icons.Material.Filled.Edit"
-                                       Color="Color.Success"
-                                       Size="Size.Small"
-                                       OnClick="() => EditOnClick(context)" />
-                        <MudIconButton Title="Xóa"
-                                       Icon="@DeleteIcon"
-                                       Color="Color.Error"
-                                       Size="Size.Small"
-                                       Style="font-size: 24px;"
-                                       OnClick="() => DeleteOnClick(context.Id)" />
-                    </MudTd>
-                </RowTemplate>
-                <NoRecordsContent>
-                    <MudText>Không tìm thấy dữ liệu</MudText>
-                </NoRecordsContent>
-                <LoadingContent>
-                    <MudText>Đang tải...</MudText>
-                </LoadingContent>
-                <PagerContent>
-                    <div class="sms-pagination">
-                        <div class="d-flex justify-content-start align-items-center">
-                            <span style="margin-top: 2px;">Hiển thị:</span>
-                            <MudSelect T="int" ValueChanged="RowsPerPageChanged" Style="width: 65px;" Value="RowsPerPage">
-                                <MudSelectItem Value="10" />
-                                <MudSelectItem Value="20" />
-                                <MudSelectItem Value="50" />
-                                <MudSelectItem Value="100" />
-                            </MudSelect>
-                        </div>
-                        <div class="d-flex justify-content-end align-items-center">
-                            @(TotalPages) trang
-                            <MudIconButton Variant="Variant.Outlined"
-                                           Size="Size.Small"
-                                           Icon="@Icons.Material.Filled.ArrowBack"
-                                           Class="ms-2 me-1 pagination-btn"
-                                           Disabled="@(PageIndex == 0)"
-                                           OnClick="PageBack" />
-                            <MudInput T="int" Variant="Variant.Outlined" Class="pagination-btn" ReadOnly="true" Value="PageCount"></MudInput>
-                            <MudIconButton Variant="Variant.Outlined"
-                                           Size="Size.Small"
-                                           Icon="@Icons.Material.Filled.ArrowForward"
-                                           Class="ms-1 pagination-btn"
-                                           Disabled="@(PageCount*RowsPerPage >= TotalCount)"
-                                           OnClick="PageNext" />
-                        </div>
-                    </div>
-                </PagerContent>
-            </MudTable>
         </div>
-    </MudCard>
+        <MudTable @ref="table"
+                  ServerData="@(new Func<TableState, Task<TableData<Tbl${name}Dto>>>(ServerLoadData))"
+                  Hover="true"
+                  Elevation="0"
+                  Dense="true"
+                  Bordered="true"
+                  Breakpoint="Breakpoint.Sm"
+                  Height="calc(100vh - 450px)"
+                  FixedHeader="true"
+                  MultiSelection="true"
+                  Style="width: 100%"
+                  @bind-SelectedItems="SelectedItems">
+            <HeaderContent>
+                <MudTh> ID </MudTh>
+                ${this.convertDanhSachRazorHeaderContent()}
+                <MudTh Style="width: 130px;text-align: center;">Hành động</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                ${this.convertDanhSachRazorRowTemplate()}
+                <MudTd DataLabel="Tương tác" Style="text-align: center;">
+                    <MudIconButton Title="Chi tiết"
+                                   Icon="@Icons.Material.Filled.RemoveRedEye"
+                                   Color="Color.Info"
+                                   Size="Size.Small"
+                                   OnClick="() => DetailOnClick(context)" />
+                </MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText>Không tìm thấy dữ liệu</MudText>
+            </NoRecordsContent>
+            <LoadingContent>
+                <MudText>Đang tải...</MudText>
+            </LoadingContent>
+            <PagerContent>
+                <div class="sms-pagination">
+                    <div class="d-flex justify-content-start align-items-center">
+                        <span style="margin-top: 2px;">Hiển thị:</span>
+                        <MudSelect T="int" ValueChanged="RowsPerPageChanged" Style="width: 65px;" Value="RowsPerPage">
+                            <MudSelectItem Value="10" />
+                            <MudSelectItem Value="20" />
+                            <MudSelectItem Value="50" />
+                            <MudSelectItem Value="100" />
+                        </MudSelect>
+                    </div>
+                    <div class="d-flex justify-content-end align-items-center">
+                        @(TotalPages) trang
+                        <MudIconButton Variant="Variant.Outlined"
+                                       Size="Size.Small"
+                                       Icon="@Icons.Material.Filled.ArrowBack"
+                                       Class="ms-2 me-1 pagination-btn"
+                                       Disabled="@(PageIndex == 0)"
+                                       OnClick="PageBack" />
+                        <MudInput T="int" Variant="Variant.Outlined" Class="pagination-btn" ReadOnly="true" Value="PageCount"></MudInput>
+                        <MudIconButton Variant="Variant.Outlined"
+                                       Size="Size.Small"
+                                       Icon="@Icons.Material.Filled.ArrowForward"
+                                       Class="ms-1 pagination-btn"
+                                       Disabled="@(PageCount*RowsPerPage >= TotalCount)"
+                                       OnClick="PageNext" />
+                    </div>
+                </div>
+            </PagerContent>
+        </MudTable>
+    </div>
+</MudCard>
   `;
     return result;
   }
 
   public createDanhSachCSContent(): string {
     let name = this.emailContentStore.moduleInfo.tableName;
-    let result: string = `
-    using Microsoft.AspNetCore.Components;
+    let nameSpace = this.emailContentStore.moduleInfo.nameSpace;
+    let result: string = `using Microsoft.AspNetCore.Components;
+    using Microsoft.JSInterop;
     using MudBlazor;
     using Newtonsoft.Json;
-    using SMS.Blazor.Pages.Components;
-    using SMS.Blazor.Services;
     using SMS.Domain.Shared.Models;
     using SMS.DuLieuGTVTService.Models;
     using SMS.DuLieuGTVTService.Services;
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
 
-    namespace SMS.Blazor.Pages.Admin.${this.emailContentStore.moduleInfo.nameSpace};
+    namespace SMS.Blazor.Pages.Admin.${nameSpace};
 
     public partial class DanhSach
     {
         [Inject] IDialogService DialogService { get; set; } = null!;
-        [Inject] ISnackbar Snackbar { get; set; } = null!;
-        [Inject] I${name}AppService AppService { get; set; } = null!;
-        [Inject] UIGlobalService UiGlobalService { get; set; } = null!;
+        [Inject] I${name.replace('Report', '')}AppService AppService { get; set; } = null!;
+        [Inject] IJSRuntime JSRuntime { get; set; } = null!;
 
         private MudTable<Tbl${name}Dto> table { get; set; } = null!;
 
@@ -877,14 +769,9 @@ export class QueryPageComponent implements OnInit {
 
         private Tbl${name}Dto? AdvanceSearch { get; set; }
 
-        private string DeleteIcon = @"<svg width=""18"" height=""24"" viewBox=""0 0 18 18"" fill=""none"" xmlns=""http://www.w3.org/2000/svg"">
-    <path d=""M2.525 18C2.125 18 1.775 17.85 1.475 17.55C1.175 17.25 1.025 16.9 1.025 16.5V2.25H0V0.75H4.7V0H11.3V0.75H16V2.25H14.975V16.5C14.975 16.9 14.825 17.25 14.525 17.55C14.225 17.85 13.875 18 13.475 18H2.525ZM13.475 2.25H2.525V16.5H13.475V2.25ZM5.175 14.35H6.675V4.375H5.175V14.35ZM9.325 14.35H10.825V4.375H9.325V14.35ZM2.525 2.25V16.5V2.25Z"" fill=""#FF8A00""/>
-    </svg>
-    ";
-
         private async Task<TableData<Tbl${name}Dto>> ServerLoadData(TableState state)
         {
-            var list = await AppService.GetListAsync(
+            var list = await AppService.GetReportAsync(
                 new ExtendPagedAndSortedResultRequestDto
                 {
                     MaxResultCount = RowsPerPage,
@@ -938,10 +825,10 @@ export class QueryPageComponent implements OnInit {
         private void DetailOnClick(Tbl${name}Dto model)
         {
             var parameters = new DialogParameters
-            {
-                { "ShowDetail", true },
-                { "Model",model }
-            };
+                {
+                    { "ShowDetail", true },
+                    { "Model",model }
+                };
             var options = new DialogOptions
             {
                 FullWidth = true,
@@ -952,110 +839,16 @@ export class QueryPageComponent implements OnInit {
             DialogService.Show<FormDialog>("Xem Thông Tin Chi Tiết", parameters, options);
         }
 
-        private void CreateOnClick()
+
+        private async Task PrintOnClick()
         {
-            var parameters = new DialogParameters
-            { { "FormEventCallback", new EventCallbackFactory().Create(this, FormDialogCallback) }, };
-            var options = new DialogOptions { FullWidth = true, MaxWidth = MaxWidth.Medium, CloseOnEscapeKey = true, DisableBackdropClick = true, };
-            DialogService.Show<FormDialog>("Thêm Mới", parameters, options);
+            await JSRuntime.InvokeVoidAsync("printElementById");
+        }
+        private async Task ExportOnClick()
+        {
+            await JSRuntime.InvokeVoidAsync("exportHTML");
         }
 
-        private void EditOnClick(Tbl${name}Dto model)
-        {
-            var parameters = new DialogParameters
-            {
-                { "Model", model },
-                { "FormEventCallback", new EventCallbackFactory().Create(this, FormDialogCallback) },
-            };
-            var options = new DialogOptions { FullWidth = true, MaxWidth = MaxWidth.Medium, CloseOnEscapeKey = true, DisableBackdropClick = true, };
-            DialogService.Show<FormDialog>("Chỉnh Sửa", parameters, options);
-        }
-
-        private void DeleteOnClick(int deleteId)
-        {
-            var parameters = new DialogParameters
-            {
-                { "ContentText", "Bạn có chắc muốn xóa dữ liệu này?" },
-                { "Color", Color.Secondary },
-                { "ButtonText", "Xóa" },
-                {
-                    "ConfirmEventCallback",
-                    new EventCallbackFactory().Create<bool>(this, (isDelete) => DeleteConfirmed(isDelete, deleteId))
-                },
-            };
-            var options = new DialogOptions { FullWidth = true, MaxWidth = MaxWidth.ExtraSmall, };
-
-            DialogService.Show<ConfirmDialog>(string.Empty, parameters, options);
-        }
-
-        private void BulkDeleteOnClick()
-        {
-            var parameters = new DialogParameters
-            {
-                { "ContentText", "Bạn có chắc muốn xóa những dữ liệu này?" },
-                { "Color", Color.Secondary },
-                { "ButtonText", "Xóa" },
-                { "ConfirmEventCallback", new EventCallbackFactory().Create<bool>(this, BulkDeleteConfirmed) },
-            };
-            var options = new DialogOptions { FullWidth = true, MaxWidth = MaxWidth.ExtraSmall, };
-
-            DialogService.Show<ConfirmDialog>(string.Empty, parameters, options);
-        }
-
-        private async Task DeleteConfirmed(bool isDelete, int deleteId)
-        {
-            if (isDelete)
-            {
-                UiGlobalService.ShowLoading();
-                try
-                {
-                    await AppService.DeleteAsync(deleteId);
-                    Snackbar.Add(
-                        "Xóa thành công",
-                        Severity.Success,
-                        config =>
-                        {
-                            config.ShowCloseIcon = false;
-                        });
-                    await table.ReloadServerData();
-                }
-                catch (Exception ex)
-                {
-                    Snackbar.Add("Lỗi: " + ex.Message, Severity.Error);
-                }
-                UiGlobalService.HideLoading();
-            }
-        }
-
-        private async Task BulkDeleteConfirmed(bool isDelete)
-        {
-            if (isDelete)
-            {
-                UiGlobalService.ShowLoading();
-                try
-                {
-                    foreach (var item in SelectedItems)
-                    {
-                        await AppService.DeleteAsync(item.Id);
-                    }
-                    Snackbar.Add(
-                        "Xóa thành công",
-                        Severity.Success,
-                        config =>
-                        {
-                            config.ShowCloseIcon = false;
-                        });
-                    await table.ReloadServerData();
-                }
-                catch (Exception ex)
-                {
-                    Snackbar.Add("Lỗi: " + ex.Message, Severity.Error);
-                }
-                UiGlobalService.HideLoading();
-            }
-        }
-
-        private async Task FormDialogCallback() { await table.ReloadServerData(); }
     }
   `;
     return result;
@@ -1063,56 +856,43 @@ export class QueryPageComponent implements OnInit {
 
   public createAppServiceContent(): string {
     let name = this.emailContentStore.moduleInfo.tableName;
-    let result: string = `using Newtonsoft.Json;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using SMS.Domain.Shared.Models;
-    using SMS.DuLieuGTVTService.Entities;
-    using SMS.DuLieuGTVTService.Models;
-    using Volo.Abp.Application.Dtos;
-    using Volo.Abp.Application.Services;
-    using Volo.Abp.Domain.Repositories;
-    using System.Linq;
-
-    namespace SMS.DuLieuGTVTService.Services;
-
-    public class ${name}AppService : CrudAppService<Tbl${name}, Tbl${name}Dto, int, ExtendPagedAndSortedResultRequestDto, Tbl${name}Dto, Tbl${name}Dto>, I${name}AppService
+    let result: string = `public async Task<PagedResultDto<Tbl${name}ReportDto>> GetReportAsync(ExtendPagedAndSortedResultRequestDto input)
     {
-        public ${name}AppService(IRepository<Tbl${name}, int> repository) : base(repository)
-        {
-        }
+        var query = await Repository.GetQueryableAsync();
+        var result = new List<Tbl${name}ReportDto>();
 
-        public override async Task<PagedResultDto<Tbl${name}Dto>> GetListAsync(ExtendPagedAndSortedResultRequestDto input)
+        if (string.IsNullOrWhiteSpace(input.JsonFilterObject))
         {
-            var query = await Repository.GetQueryableAsync();
-            if (string.IsNullOrEmpty(input.JsonFilterObject))
+            query = query
+                .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
+                    x => x.Name.Contains(input.Filter!) ||
+                        x.Code.Contains(input.Filter!) ||
+                      (x.Location != null && x.Location.Contains(input.Filter)))
+                .AsQueryable();
+        }
+        else
+        {
+            var filter = JsonConvert.DeserializeObject<Tbl${name}ReportDto>(input.JsonFilterObject);
+
+            if (filter == null)
             {
-                query = query
-                    .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
-                        x =>
-                        ${this.convertAppServiceContentGetListQuery()}
-                        )
-                    .AsQueryable();
+                query.Where(x => x.Name != null).AsQueryable();
             }
             else
             {
-                var filter = JsonConvert.DeserializeObject<Tbl${name}Dto>(input.JsonFilterObject);
-                if (filter == null)
-                    return await base.GetListAsync(input);
-
                 query = query
                 ${this.convertAppServiceContentGetListFilter()}
-                    .AsQueryable();
+              .AsQueryable();
             }
-
-            var count = await AsyncExecuter.LongCountAsync(query);
-            var list = await AsyncExecuter.ToListAsync(query.OrderBy(x => x.Id).PageBy(input.SkipCount, input.MaxResultCount));
-
-            return new PagedResultDto<Tbl${name}Dto>(
-                count,
-                ObjectMapper.Map<List<Tbl${name}>, List<Tbl${name}Dto>>(list)
-            );
         }
+
+        var count = await AsyncExecuter.LongCountAsync(query);
+        var list = await AsyncExecuter.ToListAsync(query.OrderBy(x => x.Id).PageBy(input.SkipCount, input.MaxResultCount));
+
+        return new PagedResultDto<Tbl${name}ReportDto>(
+            count,
+            ObjectMapper.Map<List<Tbl${name}>, List<Tbl${name}ReportDto>>(list)
+        );
     }
   `;
     return result;
@@ -1123,7 +903,17 @@ export class QueryPageComponent implements OnInit {
     let model = this.emailContentStore.model;
 
     model.forEach((m) => {
-      result += `.WhereIf(!string.IsNullOrWhiteSpace(filter.${m.propertyName}), x => x.${m.propertyName}.Contains(filter.${m.propertyName}))\r\n`
+      var isTime = false
+      var array = ['Date', 'Time', 'Year', 'Day', 'Month']
+      array.forEach(x => {
+        if (m.propertyName.includes(x))
+          isTime = true;
+      })
+      if (isTime) {
+        result += `.WhereIf(!string.IsNullOrWhiteSpace(filter.${m.propertyName}), x => ${!m.isRequired ? `x.${m.propertyName} != null &&` : ''} x.${m.propertyName} == filter.${m.propertyName})\r\n`
+      } else {
+        result += `.WhereIf(!string.IsNullOrWhiteSpace(filter.${m.propertyName}), x => ${!m.isRequired ? `x.${m.propertyName} != null &&` : ''} x.${m.propertyName}.Contains(filter.${m.propertyName}))\r\n`
+      }
     })
     return result;
   }
@@ -1149,6 +939,7 @@ export class QueryPageComponent implements OnInit {
 
       public interface I${name}AppService : ICrudAppService<Tbl${name}Dto, int, ExtendPagedAndSortedResultRequestDto, Tbl${name}Dto, Tbl${name}Dto>, IRemoteService
       {
+        public Task<PagedResultDto<Tbl${name}ReportDto>> GetReportAsync(ExtendPagedAndSortedResultRequestDto input);
       }
   `;
     return result;
@@ -1179,7 +970,7 @@ export class QueryPageComponent implements OnInit {
       if (m.isRequired)
         result += "[Required(ErrorMessage = SmsConstants.ErrorMessages.RequiredMessage)]\r\n";
 
-      if (m.maxLength || m.maxLength > 0)
+      if (m.maxLength && m.maxLength > 0)
         result += `[StringLength(${m.maxLength}, ErrorMessage = SmsConstants.ErrorMessages.MaxLenghtMessage + "${m.maxLength}")]\r\n`
 
       result += `public ${m.type} ${m.propertyName}${m.isRequired ? "" : "?"} { get; set; } = null!;\r\n`
@@ -1209,7 +1000,7 @@ export class QueryPageComponent implements OnInit {
     let model = this.emailContentStore.model;
 
     model.forEach(m => {
-      if (m.maxLength || m.maxLength > 0)
+      if (m.maxLength && m.maxLength > 0)
         result += `[StringLength(${m.maxLength})]\r\n`
 
       result += `public ${m.type} ${m.propertyName}${m.isRequired ? "" : "?"} { get; set; } = null!;\r\n`
