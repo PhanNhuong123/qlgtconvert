@@ -6,22 +6,21 @@
       <div
         class="relative h-2/3 w-5/6 lg:w-2/3 flex flex-col p-6 bg-white border-blue-500 border hover:shadow-md rounded-b-lg">
         <div
-          class="tabs flex w-full h-10 absolute left-0 top-0 -translate-y-full border-b border-blue-500 bg-gray-100 rounded-t-lg">
+          class="overflow-x-auto tabs flex w-full h-10 absolute left-0 top-0 -translate-y-full border-b border-blue-500 bg-gray-100 rounded-t-lg">
           <div *ngFor="let tab of vm.properties" (click)="updateCurrentTab(tab)"
             class="relative flex group capitalize justify-start items-center rounded-t-lg before:absolute before:top-full  before:h-4 before:right-0 before:left-0"
-            [ngClass]="{'bg-blue-500 border border-blue-500 text-white': vm.currentTab.queryFile === tab.queryFile, 'outline-1 hover:outline outline-blue-500 hover:before:bg-white': vm.currentTab.queryFile !== tab.queryFile, 'hidden': !unDisable(EFeatureQuery.SELECT, tab) && vm.isSelectQuery}">
+            [ngClass]="{'bg-blue-500 border border-blue-500 text-white': vm.currentTab.id === tab.id, 'outline-1 hover:outline outline-blue-500 hover:before:bg-white': vm.currentTab.id !== tab.id}">
             <span class="px-4 cursor-default select-none"
-              [ngClass]="{'border-r border-gray-300': vm.currentTab.queryFile !== tab.queryFile}">{{
-              tab.queryFile.replace('_', '
-              ')
+              [ngClass]="{'border-r border-gray-300': vm.currentTab.id !== tab.id}">{{
+              tab.fileName
               }}</span>
           </div>
         </div>
         <div *ngIf="!vm.isSelectQuery" class="relative flex-1">
           <textarea type="" id="queryText"
             class="block px-2.5 overflow-hidden hover:overflow-y-auto h-full pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-            placeholder=" " (change)="handleQueyChange($event)" (keyup)="handleQueyChange($event)"
-            [value]="vm.queryShow">
+            placeholder=" "
+            [value]="content">
         </textarea>
           <label for="queryText"
             class="absolute text-sm text-gray-500 duration-300 transform z-10 origin-[0] bg-white px-2 peer-focus:text-blue-600 top-2 scale-75 -translate-y-4 left-1">Query</label>
@@ -43,118 +42,6 @@
                     d="M5 22q-.825 0-1.413-.588T3 20V6h2v14h11v2H5Zm4-4q-.825 0-1.413-.588T7 16V4q0-.825.588-1.413T9 2h9q.825 0 1.413.588T20 4v12q0 .825-.588 1.413T18 18H9Zm0-2h9V4H9v12Zm0 0V4v12Z" />
                 </svg>
               </button>
-              <button class="px-4 bg-white hover:shadow-md py-1 rounded-md ring-1 ring-gray-300 hover:ring-blue-500"
-                (click)="openEditQuery()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-                  <path fill="#888888"
-                    d="M5 19h1.4l8.625-8.625l-1.4-1.4L5 17.6V19ZM19.3 8.925l-4.25-4.2l1.4-1.4q.575-.575 1.413-.575t1.412.575l1.4 1.4q.575.575.6 1.388t-.55 1.387L19.3 8.925ZM17.85 10.4L7.25 21H3v-4.25l10.6-10.6l4.25 4.25Zm-3.525-.725l-.7-.7l1.4 1.4l-.7-.7Z" />
-                </svg>
-              </button>
-              <button *ngIf="unDisable(EFeatureQuery.REVIEW)"
-                class="px-4 bg-white hover:shadow-md py-1 rounded-md ring-1 ring-gray-300 hover:ring-blue-500"
-                (click)="handleShowTemplate()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-                  <path fill="#888888"
-                    d="M12 9a3.02 3.02 0 0 0-3 3c0 1.642 1.358 3 3 3c1.641 0 3-1.358 3-3c0-1.641-1.359-3-3-3z" />
-                  <path fill="#888888"
-                    d="M12 5c-7.633 0-9.927 6.617-9.948 6.684L1.946 12l.105.316C2.073 12.383 4.367 19 12 19s9.927-6.617 9.948-6.684l.106-.316l-.105-.316C21.927 11.617 19.633 5 12 5zm0 12c-5.351 0-7.424-3.846-7.926-5C4.578 10.842 6.652 7 12 7c5.351 0 7.424 3.846 7.926 5c-.504 1.158-2.578 5-7.926 5z" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-        <div *ngIf="!vm.isSelectQuery" class="h-0 font-sans opacity-0 transition-all overflow-hidden"
-          [ngClass]="{ '!h-16 opacity-100': vm.editQuery }">
-          <div class="h-0 font-sans opacity-0 transition-all overflow-hidden"
-            [ngClass]="{ '!h-16 opacity-100': vm.editQuery && !vm.isSelectQuery }">
-            <div class="pt-5 pb-1 w-full text-gray-500 flex justify-center gap-4 mx-auto">
-              <button *ngIf="unDisable(EFeatureQuery.SELECT)"
-                class="px-4 capitalize font-bold bg-gray-50 text-gray-900 hover:shadow-md hover:bg-[#ffb618] py-1 rounded-md duration-500"
-                [ngClass]="{ '!bg-[#ffb618]': vm.isSelectQuery }" (click)="handleSelectingQuery()">
-                select
-              </button>
-              <button
-                class="px-4 capitalize font-bold bg-gray-50 hover:shadow-md py-1 rounded-md transform hover:rotate-6 duration-500"
-                [ngClass]="{
-              '!bg-black !text-white': vm.isQueryInsert && !vm.isEditingRawFile
-            }" (click)="changeQueryShow('insert')">
-                Insert
-              </button>
-              <button *ngIf="unDisable(EFeatureQuery.UPDATE)"
-                class="px-4 capitalize font-bold bg-gray-50 hover:shadow-md py-1 rounded-md transform hover:-rotate-3 duration-500"
-                [ngClass]="{
-              '!bg-black !text-white': !vm.isQueryInsert && !vm.isEditingRawFile
-            }" (click)="changeQueryShow('update')">
-                Update
-              </button>
-              <button
-                class="px-4 capitalize font-bold bg-[#ffb618] text-gray-900 hover:shadow-md hover:bg-black hover:text-white py-1 rounded-md duration-500"
-                (click)="closeEditQuery()">
-                Save
-              </button>
-              <button
-                class="px-4 capitalize font-bold bg-gray-50 text-gray-900 hover:shadow-md hover:bg-black hover:text-white py-1 rounded-md duration-500"
-                [ngClass]="{ '!bg-black !text-white': vm.isEditingRawFile }" (click)="editRawFile()">
-                Raw
-              </button>
-              <button
-                class="px-4 capitalize font-bold bg-gray-50 text-gray-900 hover:shadow-md hover:bg-black hover:text-white py-1 rounded-md duration-500"
-                (click)="processing()">
-                restore
-              </button>
-            </div>
-          </div>
-        </div>
-        <div *ngIf="vm.isSelectQuery" class="h-full flex flex-col">
-          <div class="h-1/6 flex items-center">
-            <div class="relative w-1/3 h-fit">
-              <input type="text" id="searchOptionList"
-                class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                placeholder=" " [value]="vm.searchValue" (change)="handleSearchChange($event)"
-                (keyup)="handleSearchChange($event)" />
-              <label for="searchOptionList"
-                class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">Search</label>
-            </div>
-            <div class="flex flex-wrap gap-2 pl-4">
-              <button
-                class="px-4 capitalize font-bold text-gray-900 hover:shadow-md bg-[#ffb618] py-1 rounded-md duration-500"
-                (click)="selectAll()">
-                {{ vm.searchResult.length > 0 ? "select search value" : "select all" }}
-              </button>
-              <button
-                class="px-4 capitalize font-bold text-gray-900 hover:shadow-md bg-[#ffb618] py-1 rounded-md duration-500"
-                (click)="deselectAll()">
-                {{ vm.searchResult.length > 0 ? "deselect search value" : "deselect all" }}
-              </button>
-              <button *ngIf="vm.searchResult.length === 0"
-                class="px-4 capitalize font-bold text-gray-900 hover:shadow-md bg-[#ffb618] py-1 rounded-md duration-500"
-                (click)="handleSelectingQuery()">
-                Save
-              </button>
-              <button *ngIf="vm.searchResult.length === 0"
-                class="px-4 capitalize font-bold bg-gray-50 text-gray-900 hover:shadow-md hover:bg-[#ffb618] py-1 rounded-md duration-500"
-                [ngClass]="{ '!bg-[#ffb618]': vm.isSelectQuery }" (click)="cancelQuerySelect()">
-                cancel
-              </button>
-              <button *ngIf="vm.searchResult.length > 0"
-                class="px-4 capitalize font-bold text-gray-900 hover:shadow-md bg-[#ffb618] py-1 rounded-md duration-500"
-                (click)="clearSearchValue()">
-                Clear
-              </button>
-            </div>
-          </div>
-          <div class="h-5/6 py-5 bg-gray-50 rounded-md">
-            <div class="h-full px-4 overflow-y-scroll">
-              <div *ngFor="let option of listOption" (click)="handleClickOption(option.id)"
-                class="flex my-0.5 py-1 border border-gray-100 hover:border-[#ffb618] rounded-md bg-white">
-                <input class="w-1/12 max-w-[20em]" type="checkbox" [checked]="listQuerySelect.has(option.id)" />
-                <span [title]="option.id"
-                  class="w-2/12 truncate xl:w-1/12 mr-6 text-center font-semibold text-gray-500 border-l border-r border-gray-200">Id:
-                  {{ option.id }}</span>
-                <span [title]="option.email" class="w-8/12 truncate font-semibold text-gray-500">{{
-                  option.email
-                  }}</span>
-              </div>
             </div>
           </div>
         </div>

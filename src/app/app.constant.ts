@@ -1,14 +1,23 @@
 export interface IProperty {
-  id: string
-  propertyName: string,
-  url?: string,
-  height?: string,
-  width?: string,
-  folder?: string,
-  queryFile: string,
-  updateWhere: string,
-  disableAction: string,
-  notInput?: string
+  label: string;
+  tableName: string;
+  link: string;
+  nameSpace: string;
+  model: string;
+}
+
+export interface ITabProperty {
+  id: string;
+  fileName: string;
+  type: ETab;
+}
+
+export interface IPropertyModel {
+  isRequired: boolean;
+  maxLength?: number;
+  propertyName: string;
+  label: string;
+  type: string;
 }
 
 export interface ITemplate {
@@ -18,14 +27,28 @@ export interface ITemplate {
 }
 
 export enum EProperty {
-  HEIGHT = 'height',
-  WIDTH = 'width',
-  URL = 'url',
-  FOLDER = 'folder'
+  LABEL = 'label',
+  NAMESPACE = 'nameSpace',
+  TABLE_NAME = 'tableName',
+  MODEL = 'model',
+  LINK = 'link',
 }
 
 export enum EFeatureQuery {
   REVIEW = 'review_template',
   SELECT = 'select_query',
   UPDATE = 'update_query'
+}
+
+export enum ETab {
+  ENTITY = 'entity',
+  DTO = 'dto',
+  I_APP_SERVICE = 'iAppService',
+  APP_SERVICE = 'appService',
+  DANH_SACH_CS = 'danhSachCs',
+  DANH_SACH_RAZOR = 'danhSachRazor',
+  FORM_DIALOG_CS = 'FormDialogCs',
+  FORM_DIALOG_RAZOR = 'FormDialogRazor',
+  SEARCH_CS = 'SearchCs',
+  SEARCH_RAZOR = 'SearchRazor'
 }
